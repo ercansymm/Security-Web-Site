@@ -1,0 +1,669 @@
+﻿@model SecurityWebSite.Models.WebDe
+@{
+    ViewData["Title"] = "Site Açıklaması";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="site-description-page">
+    <!-- Welcome Card -->
+    <div class="welcome-card">
+        <div class="welcome-content">
+            <div class="welcome-icon">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div class="welcome-text">
+                <h2>Site Açıklaması Yönetimi</h2>
+                <p>Ana sayfada ziyaretçilere gösterilecek açıklama metnini buradan düzenleyebilirsiniz</p>
+            </div>
+            <div class="welcome-stats">
+                <div class="stat-item">
+                    <div class="stat-value">@(Model?.CardDescription?.Length ?? 0)</div>
+                    <div class="stat-label">Karakter</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-value">Live</div>
+                    <div class="stat-label">Durum</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor Card -->
+    <div class="editor-container">
+        <div class="editor-card">
+            <div class="editor-header">
+                <div class="editor-title">
+                    <i class="fas fa-pen-to-square"></i>
+                    <span>Metin Düzenleyici</span>
+                </div>
+                <div class="editor-toolbar">
+                    <button type="button" class="toolbar-btn" onclick="formatText('bold')" title="Kalın">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button type="button" class="toolbar-btn" onclick="formatText('italic')" title="İtalik">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button type="button" class="toolbar-btn" onclick="clearText()" title="Temizle">
+                        <i class="fas fa-eraser"></i>
+                    </button>
+                </div>
+            </div>
+
+            <form method="post" asp-action="Create" class="description-form">
+                <div class="editor-body">
+                    <div class="textarea-container">
+                        <textarea name="CardDescription"
+                                  id="descriptionText"
+                                  class="modern-textarea"
+                                  placeholder="Site açıklaması metnini buraya yazın... Bu metin ana sayfada ziyaretçiler tarafından görülecektir."
+                                  maxlength="2000"
+                                  required>@(Model?.CardDescription ?? "")</textarea>
+
+                        <div class="textarea-footer">
+                            <div class="character-info">
+                                <span class="char-count" id="charCount">@(Model?.CardDescription?.Length ?? 0)</span>
+                                <span class="char-max">/ 2000</span>
+                            </div>
+                            <div class="word-count">
+                                <span id="wordCount">0</span> kelime
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <div class="footer-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Değişiklikler anında yayına alınacaktır</span>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-rocket"></i>
+                        <span>Kaydet ve Yayınla</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Preview Card -->
+        @if (!string.IsNullOrEmpty(Model?.CardDescription))
+        {
+            <div class="preview-card">
+                <div class="preview-header">
+                    <div class="preview-title">
+                        <i class="fas fa-desktop"></i>
+                        <span>Canlı Önizleme</span>
+                    </div>
+                    <div class="preview-badge">
+                        <i class="fas fa-eye"></i>
+                        Ziyaretçi Görünümü
+                    </div>
+                </div>
+
+                <div class="preview-body">
+                    <div class="browser-mockup">
+                        <div class="browser-header">
+                            <div class="browser-controls">
+                                <span class="control red"></span>
+                                <span class="control yellow"></span>
+                                <span class="control green"></span>
+                            </div>
+                            <div class="browser-url">www.yoursite.com</div>
+                        </div>
+                        <div class="browser-content">
+                            <div class="site-preview">
+                                <h3 class="preview-section-title">Hoş Geldiniz</h3>
+                                <p class="preview-description">@Model.CardDescription</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --border-radius: 1rem;
+        --border-radius-lg: 1.25rem;
+        --spacing-xs: 0.5rem;
+        --spacing-sm: 1rem;
+        --spacing-md: 1.5rem;
+        --spacing-lg: 2rem;
+        --spacing-xl: 3rem;
+    }
+
+    .site-description-page {
+        padding: var(--spacing-lg);
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: calc(100vh - var(--topbar-height));
+    }
+
+    /* Welcome Card */
+    .welcome-card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-lg);
+        box-shadow: var(--card-shadow);
+        border: 1px solid #e2e8f0;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .welcome-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-lg);
+    }
+
+    .welcome-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--primary-gradient);
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        flex-shrink: 0;
+    }
+
+    .welcome-text {
+        flex: 1;
+    }
+
+        .welcome-text h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .welcome-text p {
+            color: #64748b;
+            font-size: 1.125rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+    .welcome-stats {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #667eea;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-divider {
+        width: 1px;
+        height: 40px;
+        background: #e2e8f0;
+    }
+
+    /* Editor Container */
+    .editor-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: var(--spacing-lg);
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Editor Card */
+    .editor-card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--card-shadow);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        height: fit-content;
+    }
+
+    .editor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-lg);
+        background: linear-gradient(135deg, #f8fafc 0%, #e8f4fd 100%);
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .editor-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+        .editor-title i {
+            color: #667eea;
+        }
+
+    .editor-toolbar {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .toolbar-btn {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #64748b;
+        transition: all 0.2s ease;
+    }
+
+        .toolbar-btn:hover {
+            background: #f8fafc;
+            color: #667eea;
+            border-color: #cbd5e0;
+            transform: scale(1.05);
+        }
+
+    .description-form {
+        padding: 0;
+    }
+
+    .editor-body {
+        padding: var(--spacing-lg);
+    }
+
+    .textarea-container {
+        position: relative;
+        background: #fafbfc;
+        border-radius: var(--border-radius);
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+        .textarea-container:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+    .modern-textarea {
+        width: 100%;
+        min-height: 250px;
+        padding: var(--spacing-lg);
+        border: none;
+        background: transparent;
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #2d3748;
+        resize: vertical;
+        outline: none;
+    }
+
+        .modern-textarea::placeholder {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+    .textarea-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem var(--spacing-lg);
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .character-info {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .char-count {
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .char-max {
+        color: #94a3b8;
+    }
+
+    .word-count {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-lg);
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .footer-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+        .footer-info i {
+            color: #3182ce;
+        }
+
+    .submit-btn {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+    /* Preview Card */
+    .preview-card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--card-shadow);
+        border: 1px solid #e2e8f0;
+        height: fit-content;
+        position: sticky;
+        top: var(--spacing-lg);
+    }
+
+    .preview-header {
+        padding: var(--spacing-lg);
+        border-bottom: 1px solid #f1f5f9;
+        background: linear-gradient(135deg, #f8fafc 0%, #e8f4fd 100%);
+    }
+
+    .preview-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+        .preview-title i {
+            color: #3182ce;
+        }
+
+    .preview-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        background: var(--success-gradient);
+        color: white;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .preview-body {
+        padding: var(--spacing-lg);
+    }
+
+    .browser-mockup {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        border: 1px solid #e2e8f0;
+    }
+
+    .browser-header {
+        background: #f1f5f9;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .browser-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .control {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+        .control.red {
+            background: #ef4444;
+        }
+
+        .control.yellow {
+            background: #f59e0b;
+        }
+
+        .control.green {
+            background: #10b981;
+        }
+
+    .browser-url {
+        background: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+        flex: 1;
+    }
+
+    .browser-content {
+        background: white;
+        min-height: 200px;
+    }
+
+    .site-preview {
+        padding: var(--spacing-xl);
+        text-align: center;
+    }
+
+    .preview-section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: var(--spacing-md);
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .preview-description {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #4a5568;
+        margin: 0;
+        max-width: 100%;
+    }
+
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const textarea = document.getElementById('descriptionText');
+        const charCount = document.getElementById('charCount');
+        const wordCount = document.getElementById('wordCount');
+
+        function updateCounts() {
+            const text = textarea.value;
+            const length = text.length;
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+
+            charCount.textContent = length;
+            wordCount.textContent = words;
+
+            // Character count color feedback
+            if (length > 1800) {
+                charCount.style.color = '#ef4444';
+            } else if (length > 1500) {
+                charCount.style.color = '#f59e0b';
+            } else {
+                charCount.style.color = '#667eea';
+            }
+        }
+
+        if (textarea && charCount) {
+            textarea.addEventListener('input', updateCounts);
+            updateCounts(); // Initial count
+        }
+
+        // Auto-save functionality (optional)
+        let saveTimeout;
+        textarea.addEventListener('input', function() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                // Auto-save logic here if needed
+                console.log('Auto-saving...');
+            }, 2000);
+        });
+    });
+
+    // Toolbar functions
+    function formatText(command) {
+        const textarea = document.getElementById('descriptionText');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = textarea.value.substring(start, end);
+
+        if (selectedText) {
+            let formattedText = selectedText;
+            if (command === 'bold') {
+                formattedText = `**${selectedText}**`;
+            } else if (command === 'italic') {
+                formattedText = `*${selectedText}*`;
+            }
+
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start, start + formattedText.length);
+        }
+    }
+
+    function clearText() {
+        if (confirm('Metni tamamen temizlemek istediğinizden emin misiniz?')) {
+            document.getElementById('descriptionText').value = '';
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('wordCount').textContent = '0';
+        }
+    }
+
+    // Success notification
+    function showSuccessMessage() {
+        const notification = document.createElement('div');
+        notification.className = 'success-notification';
+        notification.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <span>Site açıklaması başarıyla güncellendi!</span>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+</script>
+
+<style>
+    /* Success notification */
+    .success-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--success-gradient);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: var(--card-shadow-hover);
+        transform: translateX(400px);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 9999;
+    }
+
+        .success-notification.show {
+            transform: translateX(0);
+        }
+
+        .success-notification i {
+            font-size: 1.25rem;
+        }
+</style>

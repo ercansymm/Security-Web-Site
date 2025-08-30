@@ -1,0 +1,613 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Girişi - GuvenlikBul</title>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-indigo: #6366f1;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --warning-orange: #f59e0b;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e0;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-2xl: 2rem;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+            body::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+            }
+
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            padding: 3rem;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .login-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+            }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-section {
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+            width: 5rem;
+            height: 5rem;
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+            position: relative;
+        }
+
+            .login-icon::after {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                border-radius: var(--radius-xl);
+                z-index: -1;
+            }
+
+            .login-icon i {
+                font-size: 2rem;
+                color: white;
+            }
+
+        .brand-title {
+            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-subtitle {
+            color: var(--gray-500);
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .security-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .login-form {
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+            .form-label i {
+                color: var(--gray-400);
+            }
+
+        .input-container {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 1rem 3rem 1rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            color: var(--gray-900);
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: var(--primary-blue);
+                box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+                transform: translateY(-1px);
+            }
+
+            .form-control::placeholder {
+                color: var(--gray-400);
+            }
+
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1.125rem;
+            transition: color 0.3s ease;
+        }
+
+        .form-group:focus-within .input-icon {
+            color: var(--primary-blue);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-login::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.6s ease;
+            }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+            }
+
+                .btn-login:hover::before {
+                    left: 100%;
+                }
+
+            .btn-login:active {
+                transform: translateY(0);
+            }
+
+            .btn-login:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .error-alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-left: 4px solid var(--danger-red);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+            .error-alert i {
+                color: var(--danger-red);
+                font-size: 1.125rem;
+            }
+
+        .error-alert-text {
+            color: #991b1b;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .login-footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .footer-text {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .security-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .security-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-400);
+            font-size: 0.75rem;
+        }
+
+            .security-feature i {
+                color: var(--success-green);
+            }
+
+        /* Loading State */
+        .form-loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .btn-spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Input Validation States */
+        .form-control.is-invalid {
+            border-color: var(--danger-red);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .validation-feedback {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .invalid-feedback {
+            color: var(--danger-red);
+        }
+
+        .valid-feedback {
+            color: var(--success-green);
+        }
+
+        /* Focus styles for accessibility */
+        .form-control:focus,
+        .btn-login:focus {
+            outline: 2px solid var(--primary-blue);
+            outline-offset: 2px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="brand-section">
+                    <div class="login-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <h1 class="brand-title">GuvenlikBul</h1>
+                    <p class="brand-subtitle">Admin Panel Girişi</p>
+                    <div class="security-note">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Güvenli Giriş</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="loginForm" method="post" asp-action="Login" asp-controller="Admin" class="login-form">
+                <!-- Error Alert -->
+                @if (ViewBag.Error != null)
+                {
+                    <div class="error-alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div class="error-alert-text">@ViewBag.Error</div>
+                    </div>
+                }
+
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="bi bi-person"></i>
+                        Kullanıcı Adı
+                    </label>
+                    <div class="input-container">
+                        <input type="text"
+                               class="form-control"
+                               id="username"
+                               name="UserName"
+                               placeholder="Kullanıcı adınızı girin"
+                               required
+                               autocomplete="username">
+                        <i class="input-icon bi bi-person"></i>
+                    </div>
+                    <div class="invalid-feedback validation-feedback"></div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-lock"></i>
+                        Şifre
+                    </label>
+                    <div class="input-container">
+                        <input type="password"
+                               class="form-control"
+                               id="password"
+                               name="Password"
+                               placeholder="Şifrenizi girin"
+                               required
+                               autocomplete="current-password">
+                        <button type="button"
+                                class="input-icon password-toggle"
+                                onclick="togglePassword()"
+                                title="Şifreyi göster/gizle">
+                            <i class="bi bi-eye" id="passwordToggleIcon"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback validation-feedback"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-login" id="loginButton">
+                    <i class="bi bi-box-arrow-in-right" id="loginIcon"></i>
+                    <span id="loginText">Giriş Yap</span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <div class="security-features">
+                    <div class="security-feature">
+                        <i class="bi bi-shield-check"></i>
+                        <span>SSL Şifreleme</span>
+                    </div>
+                    <div class="security-feature">
+                        <i class="bi bi-lock"></i>
+                        <span>Güvenli Oturum</span>
+                    </div>
+                    <div class="security-feature">
+                        <i class="bi bi-eye-slash"></i>
+                        <span>Gizlilik</span>
+                    </div>
+                </div>
+                <p class="footer-text">&copy; 2025 GuvenlikBul - Tüm hakları saklıdır</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form validation and submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const form = this;
+            const loginButton = document.getElementById('loginButton');
+            const loginIcon = document.getElementById('loginIcon');
+            const loginText = document.getElementById('loginText');
+
+            // Validate inputs
+            const username = document.getElementById('username');
+            const password = document.getElementById('password');
+
+            let isValid = true;
+
+            // Clear previous validation
+            clearValidation();
+
+            // Username validation
+            if (!username.value.trim()) {
+                setInvalid(username, 'Kullanıcı adı gerekli');
+                isValid = false;
+            } else if (username.value.length < 3) {
+                setInvalid(username, 'Kullanıcı adı en az 3 karakter olmalı');
+                isValid = false;
+            } else {
+                setValid(username);
+            }
+
+            // Password validation
+            if (!password.value.trim()) {
+                setInvalid(password, 'Şifre gerekli');
+                isValid = false;
+            } else {
+                setValid(password);
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Add loading state
+            form.classList.add('form-loading');
+            loginButton.disabled = true;
+            loginIcon.className = '';
+            loginIcon.innerHTML = '<div class="btn-spinner"></div>';
+            loginText.textContent = 'Giriş yapılıyor...';
+        });
+
+        function clearValidation() {
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.classList.remove('is-invalid', 'is-valid');
+            });
+            document.querySelectorAll('.validation-feedback').forEach(feedback => {
+                feedback.textContent = '';
+            });
+        }
+
+        function setInvalid(input, message) {
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            const feedback = input.closest('.form-group').querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = message;
+            }
+        }
+
+        function setValid(input) {
+            input.classList.add('is-valid');
+            input.classList.remove('is-invalid');
+        }
+
+        // Password visibility toggle
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'bi bi-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'bi bi-eye';
+            }
+        }
+
+        // Style password toggle button
+        document.querySelector('.password-toggle').style.cssText = `
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            height: auto;
+            transition: color 0.3s ease;
+        `;
+
+        // Enhanced input interactions
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.closest('.form-group').classList.add('focused');
+            });
+
+            input.addEventListener('blur', function() {
+                this.closest('.form-group').classList.remove('focused');
+            });
+
+            // Real-time validation feedback
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Auto-focus username on load
+        window.addEventListener('load', function() {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>

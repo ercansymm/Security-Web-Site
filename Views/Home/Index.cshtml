@@ -1,0 +1,649 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Sayfa - Güvenlik Sistemleri</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <section id="hero" class="hero section">
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="hero-content">
+
+                        <div class="brand-section">
+                            <!-- LOGO ALANI - BURAYA KENDI LOGONU EKLE -->
+                            <img src="/LOGO/logo_2-removebg-preview.png" alt="A Güvenlik Logo" class="brand-logo-img" />
+
+                            <h1 class="brand-title">GüvenlikBul</h1>
+                            <div class="brand-line"></div>
+                        </div>
+
+                        <h2 class="hero-slogan">
+                            "Güvenliğiniz Bizim Önceliğimiz"
+                        </h2>
+
+                        <div class="action-buttons">
+                            <a href="SearchPersonel/Index" class="btn btn-security btn-action">
+                                <div class="btn-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="btn-content">
+                                    <span class="btn-title">Güvenlik Bul</span>
+                                    <small class="btn-desc">Güvenlik Personeli arayın</small>
+                                </div>
+                            </a>
+
+                            <a href="Personels/Index" class="btn btn-career btn-action">
+                                <div class="btn-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="btn-content">
+                                    <span class="btn-title">İş Başvurusunda Bulun</span>
+                                    <small class="btn-desc">Güvenlik personeli olarak çalışın</small>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="trust-indicators">
+                            <div class="trust-item">
+                                <i class="fas fa-award"></i>
+                                <span>Lisanslı ve Sertifikalı</span>
+                            </div>
+                            <div class="trust-item">
+                                <i class="fas fa-clock"></i>
+                                <span>7/24 Hizmet</span>
+                            </div>
+                            <div class="trust-item">
+                                <i class="fas fa-users"></i>
+                                <span>15.000+ Müşteri</span>
+                            </div>
+                        </div>
+
+                        <!-- Ek Özellikler -->
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <h3>Profesyonel Kadro</h3>
+                                <p>Eğitimli ve deneyimli güvenlik personelleri</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <h3>Destek Hattı</h3>
+                                <p>7/24 müşteri destek hizmetleri</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <h3>Güvenilir Hizmet</h3>
+                                <p>Yüksek standartlarda güvenlik çözümleri</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <h3>Geniş Kapsam</h3>
+                                <p>Türkiye'nin her bölgesinde hizmet</p>
+                            </div>
+                        </div>
+
+                        <!-- YENİ EKLENEN GÖRÜŞ VE ÖNERİLER BÖLÜMÜ -->
+                        <div class="feedback-section">
+                            <div class="feedback-container">
+                                <div class="feedback-icon">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <div class="feedback-content">
+                                    <h3>Görüş ve Önerilerinizi Bizlere Bildirin</h3>
+                                    <p>Hizmet kalitemizi artırmak için değerli görüşleriniz bizim için çok önemli</p>
+                                    <div class="email-display">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>gorusler@guvenlikbul.com</span>
+                                        <button class="copy-email-btn" onclick="copyEmail()">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if (ViewBag.WebDescription != null)
+    {
+        <div class="web-description">
+            <div class="container">
+                <div class="description-content">
+                    <div class="description-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3>Açıklama</h3>
+                    <p>@ViewBag.WebDescription.CardDescription</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+        }
+
+        .col-lg-10 {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #f8fafc 50%, #e0f2fe 75%, #f0f9ff 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            padding: 4rem 0;
+        }
+
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(96, 165, 250, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Hero Content */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            color: #1f2937;
+            padding: 2rem 0;
+            width: 100%;
+        }
+
+        /* Brand Section */
+        .brand-section {
+            margin-bottom: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* LOGO ALANI CSS */
+        .brand-logo-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            transition: all 0.3s ease;
+        }
+
+        .brand-section:hover .brand-logo-img {
+            transform: scale(1.05);
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+        }
+
+        .brand-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            text-align: center;
+            width: 100%;
+            display: block;
+        }
+
+        .brand-line {
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #60a5fa, transparent);
+            margin: 0 auto;
+            border-radius: 2px;
+            display: block;
+        }
+
+        /* Hero Slogan */
+        .hero-slogan {
+            font-size: 2rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #6b7280;
+            margin: 0 auto 3rem auto;
+            line-height: 1.2;
+            position: relative;
+            text-align: center;
+            width: 100%;
+            display: block;
+            padding: 0 1rem;
+            max-width: 800px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-width: 300px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+            .btn-action:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                text-decoration: none;
+            }
+
+        .btn-security {
+            border-left: 4px solid #10b981;
+        }
+
+            .btn-security:hover {
+                background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+                border-color: #10b981;
+            }
+
+        .btn-career {
+            border-left: 4px solid #3b82f6;
+        }
+
+            .btn-career:hover {
+                background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+                border-color: #3b82f6;
+            }
+
+        .btn-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.5rem;
+            font-size: 24px;
+            color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-security:hover .btn-icon {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            transform: rotate(5deg) scale(1.1);
+        }
+
+        .btn-career:hover .btn-icon {
+            transform: rotate(5deg) scale(1.1);
+        }
+
+        .btn-content {
+            text-align: left;
+            color: #1f2937;
+        }
+
+        .btn-title {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.5px;
+            color: #1f2937;
+        }
+
+        .btn-desc {
+            display: block;
+            font-size: 0.95rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        /* Trust Indicators */
+        .trust-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            padding: 2rem 0;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 4rem;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            color: #6b7280;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .trust-item:hover {
+                color: #1f2937;
+                transform: translateY(-2px);
+            }
+
+            .trust-item i {
+                font-size: 24px;
+                margin-right: 0.8rem;
+                color: #3b82f6;
+                transition: all 0.3s ease;
+            }
+
+            .trust-item:hover i {
+                color: #10b981;
+                transform: scale(1.2);
+            }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .feature-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                border-color: #3b82f6;
+            }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 28px;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* YENİ EKLENEN - Feedback Section CSS */
+        .feedback-section {
+            margin-top: 4rem;
+            padding: 3rem 0;
+            border-top: 1px solid #e5e7eb;
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feedback-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .feedback-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .feedback-container:hover .feedback-icon {
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
+        }
+
+        .feedback-content {
+            flex: 1;
+            text-align: center;
+            min-width: 300px;
+        }
+
+            .feedback-content h3 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #1f2937;
+                margin-bottom: 0.8rem;
+            }
+
+            .feedback-content p {
+                color: #6b7280;
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+                line-height: 1.6;
+            }
+
+        .email-display {
+            display: inline-flex;
+            align-items: center;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .email-display:hover {
+                border-color: #f59e0b;
+                box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);
+                transform: translateY(-2px);
+            }
+
+            .email-display i.fa-envelope {
+                font-size: 18px;
+                color: #f59e0b;
+            }
+
+            .email-display span {
+                font-size: 1.1rem;
+                font-weight: 500;
+                color: #1f2937;
+                letter-spacing: 0.5px;
+            }
+
+        .copy-email-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .copy-email-btn:hover {
+                background: #f59e0b;
+                color: white;
+                transform: scale(1.1);
+            }
+
+
+
+        /* Web Description Section */
+        .web-description {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            padding: 4rem 0;
+            margin-top: -2px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .description-content {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .description-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 36px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .description-content h3 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .description-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #6b7280;
+        }
+
+
+    </style>
+
+    <script>
+        function copyEmail() {
+            const email = "gorusler@guvenlikbul.com";
+            navigator.clipboard.writeText(email).then(function() {
+                // Başarılı kopyalama feedback'i
+                const copyBtn = document.querySelector('.copy-email-btn');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.style.background = '#10b981';
+                copyBtn.style.color = 'white';
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.background = '';
+                    copyBtn.style.color = '';
+                }, 2000);
+            }).catch(function() {
+                alert('E-mail adresi kopyalanamadı: ' + email);
+            });
+        }
+
+        // E-mail alanına tıklandığında da kopyala
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailDisplay = document.querySelector('.email-display');
+            emailDisplay.addEventListener('click', copyEmail);
+        });
+    </script>
+
+</body>
+</html>

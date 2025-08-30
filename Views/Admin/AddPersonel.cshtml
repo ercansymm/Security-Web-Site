@@ -1,0 +1,1087 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Personel Yönetimi";
+}
+
+<div id="personelApp" class="personnel-management-page">
+    <!-- Page Header -->
+    <div class="page-header-section">
+        <div class="header-content">
+            <div class="header-info">
+                <div class="header-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Personel Yönetimi</h1>
+                    <p>Personel durumlarını yönetin ve takip edin</p>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat-grid">
+                    <div class="stat-card total">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ allPersonels.length }}</div>
+                            <div class="stat-label">Toplam</div>
+                        </div>
+                    </div>
+                    <div class="stat-card active">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ activeCount }}</div>
+                            <div class="stat-label">Aktif</div>
+                        </div>
+                    </div>
+                    <div class="stat-card passive">
+                        <div class="stat-icon">
+                            <i class="fas fa-pause-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ passiveCount }}</div>
+                            <div class="stat-label">Pasif</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button"
+                    :class="{ active: currentTab === 'all' }"
+                    v-on:click="switchTab('all')">
+                <i class="fas fa-list"></i>
+                <span>Tümü</span>
+                <div class="tab-badge">{{ allPersonels.length }}</div>
+            </button>
+            <button class="tab-button"
+                    :class="{ active: currentTab === 'active' }"
+                    v-on:click="switchTab('active')">
+                <i class="fas fa-user-check"></i>
+                <span>Aktif</span>
+                <div class="tab-badge active">{{ activeCount }}</div>
+            </button>
+            <button class="tab-button"
+                    :class="{ active: currentTab === 'passive' }"
+                    v-on:click="switchTab('passive')">
+                <i class="fas fa-user-times"></i>
+                <span>Pasif</span>
+                <div class="tab-badge passive">{{ passiveCount }}</div>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text"
+                       class="search-input"
+                       v-model="searchQuery"
+                       placeholder="Personel ara... (isim, telefon, şehir)">
+                <div class="search-clear" v-on:click="searchQuery = ''" v-if="searchQuery">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+        <!-- Table Container -->
+        <div class="table-wrapper" v-if="filteredPersonels.length > 0">
+            <div class="table-container">
+                <table class="personnel-table">
+                    <thead>
+                        <tr>
+                            <th>Personel Bilgisi</th>
+                            <th>Konum</th>
+                            <th>Yaş</th>
+                            <th>Çalışma Durumu</th>
+                            <th>Güvenlik Türü</th>
+                            <th>Vardiya</th>
+                            <th>Durum</th>
+                            <th>Aktif/Pasif</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="personel in filteredPersonels" :key="personel.ref" class="table-row">
+                            <td>
+                                <div class="personnel-info">
+                                    <div class="personnel-avatar">
+                                        {{ getInitials(personel) }}
+                                    </div>
+                                    <div class="personnel-details">
+                                        <div class="personnel-name">
+                                            {{ personel.cardName }} {{ personel.lastName }}
+                                        </div>
+                                        <div class="personnel-contact">
+                                            {{ formatPhone(personel.phoneNumber) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="location-info">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ personel.city || 'Belirtilmemiş' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="age-info">
+                                    {{ personel.yearsOld ? personel.yearsOld + ' yaş' : '-' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="status-badge" :class="personel.working ? 'working' : 'available'">
+                                    <i class="fas" :class="personel.working ? 'fa-briefcase' : 'fa-check-circle'"></i>
+                                    <span>{{ personel.working ? 'Çalışıyor' : 'Müsait' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="security-badge" :class="personel.gun ? 'armed' : 'unarmed'">
+                                    <i class="fas" :class="personel.gun ? 'fa-shield-alt' : 'fa-user'"></i>
+                                    <span>{{ personel.gun ? 'Silahlı' : 'Silahsız' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="shift-badge">
+                                    <i class="fas fa-clock"></i>
+                                    <span>{{ personel.shift ? 'Vardiyalı' : 'Normal' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="activity-badge" :class="!personel.isPassive ? 'active' : 'passive'">
+                                    <i class="fas" :class="!personel.isPassive ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                                    <span>{{ !personel.isPassive ? 'Aktif' : 'Pasif' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="toggle-container">
+                                    <label class="modern-toggle">
+                                        <input type="checkbox"
+                                               :checked="!personel.isPassive"
+                                               v-on:change="toggleStatus(personel)"
+                                               :disabled="updating">
+                                        <span class="toggle-slider">
+                                            <span class="toggle-button"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons-cell">
+                                    <button class="btn-action btn-delete"
+                                            v-on:click="deletePersonel(personel)"
+                                            :disabled="deleting === personel.ref">
+                                        <i class="fas fa-trash" v-if="deleting !== personel.ref"></i>
+                                        <span class="mini-spinner" v-else></span>
+                                        <span>Sil</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3>{{ searchQuery ? 'Personel Bulunamadı' : 'Henüz Personel Yok' }}</h3>
+            <p v-if="searchQuery">Arama kriterlerinize uygun personel bulunamadı.</p>
+            <p v-else>Sisteme henüz personel kaydı eklenmemiş.</p>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-backdrop" v-if="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Personeller yükleniyor...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #3b82f6;
+        --primary-indigo: #6366f1;
+        --success-green: #10b981;
+        --danger-red: #ef4444;
+        --warning-orange: #f59e0b;
+        --info-blue: #06b6d4;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e0;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .personnel-management-page {
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        min-height: calc(100vh - 70px);
+    }
+
+    /* Page Header */
+    .page-header-section {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray-200);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .header-info {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.75rem;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .header-text h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+
+    .header-text p {
+        color: var(--gray-500);
+        font-size: 1.125rem;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .header-stats {
+        flex-shrink: 0;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-card.total {
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .stat-card.active {
+            border-left: 4px solid var(--success-green);
+        }
+
+        .stat-card.passive {
+            border-left: 4px solid var(--gray-400);
+        }
+
+    .stat-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+    }
+
+    .stat-card.total .stat-icon {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-blue);
+    }
+
+    .stat-card.active .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-green);
+    }
+
+    .stat-card.passive .stat-icon {
+        background: rgba(148, 163, 184, 0.1);
+        color: var(--gray-400);
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-card.total .stat-value {
+        color: var(--primary-blue);
+    }
+
+    .stat-card.active .stat-value {
+        color: var(--success-green);
+    }
+
+    .stat-card.passive .stat-value {
+        color: var(--gray-400);
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Controls Section */
+    .controls-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .tab-navigation {
+        display: flex;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.5rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+    }
+
+    .tab-button {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        border: none;
+        background: transparent;
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .tab-button:hover {
+            color: var(--gray-700);
+            background: var(--gray-50);
+        }
+
+        .tab-button.active {
+            color: var(--primary-blue);
+            background: rgba(59, 130, 246, 0.1);
+            font-weight: 600;
+        }
+
+    .tab-badge {
+        background: var(--gray-200);
+        color: var(--gray-600);
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.5rem;
+        border-radius: 1rem;
+        min-width: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .tab-button.active .tab-badge {
+        background: var(--primary-blue);
+        color: white;
+    }
+
+    .tab-badge.active {
+        background: var(--success-green);
+        color: white;
+    }
+
+    .tab-badge.passive {
+        background: var(--gray-400);
+        color: white;
+    }
+
+    .search-container {
+        flex-shrink: 0;
+        width: 350px;
+    }
+
+    .search-box {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 3rem 0.75rem 3rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        color: var(--gray-700);
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        font-size: 1rem;
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        cursor: pointer;
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+        .search-clear:hover {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+    /* Content Card */
+    .content-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+    }
+
+    /* Table */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .table-container {
+        min-width: 1000px;
+    }
+
+    .personnel-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .personnel-table thead {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        }
+
+        .personnel-table th {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            border-bottom: 1px solid var(--gray-200);
+            white-space: nowrap;
+        }
+
+        .personnel-table td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+        }
+
+    .table-row {
+        transition: all 0.3s ease;
+    }
+
+        .table-row:hover {
+            background: var(--gray-50);
+        }
+
+    .personnel-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .personnel-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .personnel-details {
+        min-width: 0;
+    }
+
+    .personnel-name {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 0.875rem;
+        margin-bottom: 0.125rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+
+    .personnel-contact {
+        color: var(--gray-500);
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .location-info {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: var(--gray-600);
+        font-size: 0.75rem;
+    }
+
+        .location-info i {
+            color: var(--gray-400);
+            font-size: 0.7rem;
+        }
+
+    .age-info {
+        color: var(--gray-600);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    /* Status Badges */
+    .status-badge,
+    .security-badge,
+    .shift-badge,
+    .activity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.5rem;
+        border-radius: var(--radius-md);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+        .status-badge.working {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-orange);
+        }
+
+        .status-badge.available {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+        }
+
+        .security-badge.armed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+
+        .security-badge.unarmed {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--info-blue);
+        }
+
+    .shift-badge {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary-indigo);
+    }
+
+    .activity-badge.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-green);
+    }
+
+    .activity-badge.passive {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-red);
+    }
+
+    /* Modern Toggle */
+    .toggle-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .modern-toggle {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+        .modern-toggle input {
+            display: none;
+        }
+
+    .toggle-slider {
+        display: block;
+        width: 3rem;
+        height: 1.5rem;
+        background: var(--gray-300);
+        border-radius: 2rem;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-button {
+        position: absolute;
+        top: 0.125rem;
+        left: 0.125rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        background: white;
+        border-radius: 50%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-md);
+    }
+
+    .modern-toggle input:checked + .toggle-slider {
+        background: var(--success-green);
+    }
+
+        .modern-toggle input:checked + .toggle-slider .toggle-button {
+            transform: translateX(1.5rem);
+        }
+
+    .modern-toggle input:disabled + .toggle-slider {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Action Buttons */
+    .action-buttons-cell {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+    }
+
+        .btn-delete:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-delete:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+    .mini-spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--gray-500);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--gray-300);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Loading */
+    .loading-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    }
+
+    .loading-content {
+        text-align: center;
+        color: white;
+    }
+
+    .loading-spinner {
+        width: 3rem;
+        height: 3rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    .loading-content p {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+</style>
+
+<!-- Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                allPersonels: [],
+                currentTab: 'all',
+                searchQuery: '',
+                loading: false,
+                updating: false,
+                deleting: null
+            }
+        },
+        computed: {
+            activeCount() {
+                return this.allPersonels.filter(p => !p.isPassive).length;
+            },
+            passiveCount() {
+                return this.allPersonels.filter(p => p.isPassive).length;
+            },
+            filteredPersonels() {
+                let filtered = this.allPersonels;
+
+                // Tab filtreleme
+                if (this.currentTab === 'active') {
+                    filtered = filtered.filter(p => !p.isPassive);
+                } else if (this.currentTab === 'passive') {
+                    filtered = filtered.filter(p => p.isPassive);
+                }
+
+                // Arama filtreleme
+                if (this.searchQuery) {
+                    const query = this.searchQuery.toLowerCase();
+                    filtered = filtered.filter(p => {
+                        const fullName = `${p.cardName || ''} ${p.lastName || ''}`.toLowerCase();
+                        const phone = (p.phoneNumber || '').toLowerCase();
+                        const city = (p.city || '').toLowerCase();
+
+                        return fullName.includes(query) ||
+                               phone.includes(query) ||
+                               city.includes(query);
+                    });
+                }
+
+                return filtered;
+            }
+        },
+        methods: {
+            async loadPersonels() {
+                this.loading = true;
+                try {
+                    const response = await fetch('/Admin/GetAllPersonels');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.allPersonels = data.data;
+                    } else {
+                        this.showError('Personeller yüklenirken bir hata oluştu.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showError('Bağlantı hatası oluştu.');
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            switchTab(tab) {
+                this.currentTab = tab;
+            },
+
+            getInitials(personel) {
+                const first = personel.cardName ? personel.cardName.charAt(0).toUpperCase() : '';
+                const last = personel.lastName ? personel.lastName.charAt(0).toUpperCase() : '';
+                return first + last || 'P';
+            },
+
+            formatPhone(phone) {
+                if (!phone) return '-';
+                const cleaned = phone.replace(/\D/g, '');
+                if (cleaned.length === 11) {
+                    return `${cleaned.substr(0, 4)} ${cleaned.substr(4, 3)} ${cleaned.substr(7, 2)} ${cleaned.substr(9)}`;
+                }
+                return phone;
+            },
+
+            async toggleStatus(personel) {
+                const newStatus = !personel.isPassive;
+                const statusText = newStatus ? 'pasif' : 'aktif';
+
+                const result = await Swal.fire({
+                    title: 'Personel Durumu Değiştir',
+                    html: `<strong>${personel.cardName} ${personel.lastName}</strong> adlı personeli <strong>${statusText}</strong> yapmak istediğinizden emin misiniz?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: newStatus ? '#dc3545' : '#10b981',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: `<i class="fas ${newStatus ? 'fa-pause' : 'fa-play'}"></i> Evet, ${statusText.toUpperCase()} yap`,
+                    cancelButtonText: '<i class="fas fa-times"></i> İptal',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'modern-swal-popup',
+                        title: 'modern-swal-title',
+                        content: 'modern-swal-content'
+                    }
+                });
+
+                if (result.isConfirmed) {
+                    this.updating = true;
+                    try {
+                        const response = await fetch('/Admin/UpdatePersonelStatus', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                personelId: personel.ref,
+                                isPassive: newStatus
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            personel.isPassive = newStatus;
+
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Başarılı!',
+                                text: `${personel.cardName} ${personel.lastName} ${statusText} duruma getirildi.`,
+                                timer: 2000,
+                                showConfirmButton: false,
+                                toast: true,
+                                position: 'top-end'
+                            });
+
+                            setTimeout(() => {
+                                this.loadPersonels();
+                            }, 2100);
+                        } else {
+                            this.showError(data.message || 'Durum güncellenirken bir hata oluştu.');
+                            await this.loadPersonels();
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.showError('Bağlantı hatası oluştu.');
+                        await this.loadPersonels();
+                    } finally {
+                        this.updating = false;
+                    }
+                } else {
+                    await this.loadPersonels();
+                }
+            },
+
+            showError(message) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: message,
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Tamam'
+                });
+            },
+
+            async deletePersonel(personel) {
+                const result = await Swal.fire({
+                    title: 'Personeli Sil',
+                    html: `
+                        <div style="text-align: center;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i>
+                            <p style="font-size: 1.1rem; margin: 1rem 0;">
+                                <strong>${personel.cardName} ${personel.lastName}</strong> adlı personeli silmek istediğinizden emin misiniz?
+                            </p>
+                            <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                                <p style="color: #991b1b; margin: 0; font-size: 0.9rem;">
+                                    <i class="fas fa-info-circle"></i>
+                                    Bu işlem geri alınamaz!
+                                </p>
+                            </div>
+                        </div>
+                    `,
+                    icon: null,
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Evet, Sil!',
+                    cancelButtonText: 'İptal',
+                    reverseButtons: true
+                });
+
+                if (result.isConfirmed) {
+                    this.deleting = personel.ref;
+
+                    try {
+                        const response = await fetch('/Admin/DeletePersonel', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                personelId: personel.ref
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            this.allPersonels = this.allPersonels.filter(p => p.ref !== personel.ref);
+
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Silindi!',
+                                text: `${personel.cardName} ${personel.lastName} başarıyla silindi.`,
+                                confirmButtonColor: '#10b981',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                toast: true,
+                                position: 'top-end'
+                            });
+                        } else {
+                            this.showError(data.message || 'Silme işlemi başarısız oldu.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.showError('Personel silinirken bir hata oluştu.');
+                    } finally {
+                        this.deleting = null;
+                    }
+                }
+            }
+        },
+        mounted() {
+            this.loadPersonels();
+        }
+    }).mount('#personelApp');
+</script>

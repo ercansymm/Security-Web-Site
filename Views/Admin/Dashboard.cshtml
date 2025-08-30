@@ -1,0 +1,272 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "";
+}
+
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+
+    .welcome-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .welcome-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .welcome-subtitle {
+        font-size: 18px;
+        color: #6c757d;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card.primary {
+            border-left-color: #667eea;
+        }
+
+        .stat-card.success {
+            border-left-color: #48bb78;
+        }
+
+        .stat-card.warning {
+            border-left-color: #ed8936;
+        }
+
+        .stat-card.info {
+            border-left-color: #4299e1;
+        }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .stat-card.success .stat-icon {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+    }
+
+    .stat-card.warning .stat-icon {
+        background: linear-gradient(135deg, #ed8936, #dd6b20);
+    }
+
+    .stat-card.info .stat-icon {
+        background: linear-gradient(135deg, #4299e1, #3182ce);
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 16px;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .quick-actions {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #495057;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            border-color: transparent;
+        }
+
+        .action-btn i {
+            font-size: 20px;
+        }
+
+    .recent-activity {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .activity-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.3s ease;
+    }
+
+        .activity-item:hover {
+            background: #f8f9fa;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f0f0;
+        color: #667eea;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .activity-time {
+        font-size: 14px;
+        color: #6c757d;
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Hoşgeldin Mesajı -->
+    <div class="welcome-section">
+        <h1 class="welcome-title">Hoş Geldiniz, @ViewBag.AdminUser!</h1>
+        <p class="welcome-subtitle">Admin paneline başarıyla giriş yaptınız. Aşağıdan sistem istatistiklerini görebilirsiniz.</p>
+    </div>
+
+    <!-- İstatistik Kartları -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">@ViewBag.PersonelCount</div>
+            <div class="stat-label">Toplam Personel</div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-value">@ViewBag.UserCount</div>
+            <div class="stat-label">Admin Kullanıcı</div>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-value">%100</div>
+            <div class="stat-label">Sistem Durumu</div>
+        </div>
+    </div>
+
+    <!-- Hızlı İşlemler -->
+    <div class="quick-actions">
+        <h2 class="section-title">Hızlı İşlemler</h2>
+        <div class="action-buttons">
+            <a href="/Admin/AddPersonel" class="action-btn">
+                <i class="fas fa-user-plus"></i>
+                <span>Yeni Personel Ekle</span>
+            </a>
+            <a href="/Admin/AddPersonel" class="action-btn">
+                <i class="fas fa-search"></i>
+                <span>Personel Ara</span>
+            </a>
+            <a href="/Users/Index" class="action-btn">
+                <i class="fas fa-user-cog"></i>
+                <span>Admin Ekle</span>
+            </a>
+            <a href="/WebDes/Index" class="action-btn">
+                <i class="fas fa-edit"></i>
+                <span>Web Açıklaması Düzenle</span>
+            </a>
+        </div>
+    </div>
+
+</div>

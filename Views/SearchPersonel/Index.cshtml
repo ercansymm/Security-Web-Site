@@ -1,0 +1,1049 @@
+﻿@model IEnumerable<SecurityWebSite.Models.Personel>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 3rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .page-title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: #1f2937;
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 2px;
+        }
+
+    .step-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .step-item {
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        opacity: 0.5;
+        position: relative;
+    }
+
+        .step-item.active {
+            opacity: 1;
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .step-item.completed {
+            opacity: 1;
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .step-item.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .step-item.active .step-number {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        color: #ffffff;
+    }
+
+    .step-item.completed .step-number {
+        background: #10b981;
+        color: #ffffff;
+    }
+
+    .step-title {
+        color: #1f2937;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .step-content {
+        margin-left: 3rem;
+    }
+
+    .option-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .option-card {
+        background: #ffffff;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+    }
+
+        .option-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .option-card.selected {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+    .option-icon {
+        font-size: 2rem;
+        color: #3b82f6;
+        margin-bottom: 0.8rem;
+        display: block;
+    }
+
+    .option-card.selected .option-icon {
+        color: #10b981;
+    }
+
+    .option-title {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .option-subtitle {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin: 0.3rem 0 0 0;
+    }
+
+    .selected-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        background: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.8rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .option-card.selected .selected-indicator {
+        opacity: 1;
+    }
+
+    .age-range-container {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        margin: 1rem 0;
+    }
+
+    .age-input {
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        color: #1f2937;
+        font-size: 1.1rem;
+        text-align: center;
+        width: 80px;
+        transition: all 0.3s ease;
+    }
+
+        .age-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+    .age-separator {
+        color: #6b7280;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .search-btn {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 1.5rem 4rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 3rem auto 0 auto;
+        min-width: 200px;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+    }
+
+        .search-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        .search-btn:disabled {
+            background: linear-gradient(135deg, #9ca3af, #d1d5db);
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+
+    .results-section {
+        margin-top: 4rem;
+        padding-top: 3rem;
+        border-top: 2px solid #e5e7eb;
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .results-title {
+        color: #1f2937;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .results-count {
+        color: #10b981;
+        font-weight: 600;
+        background: #f0fdf4;
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+        border: 1px solid #10b981;
+        font-size: 1.1rem;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .person-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+        .person-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+    .person-photo {
+        flex-shrink: 0;
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid #e5e7eb;
+        background: #f9fafb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .person-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .person-photo-placeholder {
+        color: #d1d5db;
+        font-size: 2rem;
+    }
+
+    .person-content {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .person-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .person-name {
+        color: #1f2937;
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .person-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+    .detail-icon {
+        color: #3b82f6;
+        font-size: 1rem;
+        width: 16px;
+    }
+
+    .person-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.8rem;
+    }
+
+    .status-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .status-available {
+        background: #f0fdf4;
+        color: #10b981;
+        border: 1px solid #10b981;
+    }
+
+    .status-working {
+        background: #fef3c7;
+        color: #f59e0b;
+        border: 1px solid #f59e0b;
+    }
+
+    .status-shift {
+        background: #eff6ff;
+        color: #3b82f6;
+        border: 1px solid #3b82f6;
+    }
+
+    .status-armed {
+        background: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #ef4444;
+    }
+
+    .status-unarmed {
+        background: #f0fdf4;
+        color: #22c55e;
+        border: 1px solid #22c55e;
+    }
+
+    .status-advice {
+        background: #f3e8ff;
+        color: #9333ea;
+        border: 1px solid #9333ea;
+    }
+
+    .status-security {
+        background: #fef3c7;
+        color: #ea580c;
+        border: 1px solid #ea580c;
+    }
+
+    .contact-btn {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    }
+
+        .contact-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+    .no-results {
+        text-align: center;
+        color: #6b7280;
+        padding: 4rem;
+        font-size: 1.2rem;
+    }
+
+        .no-results i {
+            font-size: 4rem;
+            color: #e5e7eb;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+    .loading {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid #e5e7eb;
+        border-radius: 50%;
+        border-top-color: #3b82f6;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    .search-select {
+        width: 100%;
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        color: #1f2937;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 1rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5rem;
+        padding-right: 3rem;
+    }
+
+        .search-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+</style>
+
+<div id="searchApp" class="search-container">
+    <h1 class="page-title">Personel Arama</h1>
+
+    <div class="step-container">
+        <!-- 1. Adım: Şehir Seçimi -->
+        <div class="step-item" :class="{ 'active': currentStep === 1, 'completed': currentStep > 1 }">
+            <div class="step-header">
+                <div class="step-number">
+                    <i v-if="currentStep > 1" class="fas fa-check"></i>
+                    <span v-else>1</span>
+                </div>
+                <h3 class="step-title">Şehir Seçimi</h3>
+            </div>
+            <div class="step-content" v-if="currentStep >= 1">
+                <select v-model="searchFilters.city"
+                        v-on:change="selectCity"
+                        class="search-select"
+                        style="max-width: 400px; margin: 0 auto; display: block;">
+                    <option value="">Şehir seçiniz...</option>
+                    <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 2. Adım: Pozisyon Türü -->
+        <div class="step-item" :class="{ 'active': currentStep === 2, 'completed': currentStep > 2, 'disabled': currentStep < 2 }">
+            <div class="step-header">
+                <div class="step-number">
+                    <i v-if="currentStep > 2" class="fas fa-check"></i>
+                    <span v-else>2</span>
+                </div>
+                <h3 class="step-title">Pozisyon Türü</h3>
+            </div>
+            <div class="step-content" v-if="currentStep >= 2">
+                <div class="option-grid">
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.positionType === 'advice' }"
+                         v-on:click="selectPositionType('advice')">
+                        <i class="fas fa-user-tie option-icon"></i>
+                        <h4 class="option-title">Danışma/Karşılama</h4>
+                        <p class="option-subtitle">Danışma ve karşılama personeli</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.positionType === 'security' }"
+                         v-on:click="selectPositionType('security')">
+                        <i class="fas fa-shield-alt option-icon"></i>
+                        <h4 class="option-title">Güvenlik Personeli</h4>
+                        <p class="option-subtitle">Güvenlik görevlileri</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.positionType === 'all' }"
+                         v-on:click="selectPositionType('all')">
+                        <i class="fas fa-users option-icon"></i>
+                        <h4 class="option-title">Tümü</h4>
+                        <p class="option-subtitle">Tüm personel türleri</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Adım: Yaş Aralığı -->
+        <div class="step-item" :class="{ 'active': currentStep === 3, 'completed': currentStep > 3, 'disabled': currentStep < 3 }">
+            <div class="step-header">
+                <div class="step-number">
+                    <i v-if="currentStep > 3" class="fas fa-check"></i>
+                    <span v-else>3</span>
+                </div>
+                <h3 class="step-title">Yaş Aralığı</h3>
+            </div>
+            <div class="step-content" v-if="currentStep >= 3">
+                <div class="age-range-container">
+                    <div>
+                        <label style="color: #6b7280; display: block; margin-bottom: 0.5rem;">Min Yaş</label>
+                        <input type="number"
+                               v-model="searchFilters.minAge"
+                               v-on:input="updateAgeRange"
+                               class="age-input"
+                               placeholder="18"
+                               min="18"
+                               max="65" />
+                    </div>
+                    <span class="age-separator">-</span>
+                    <div>
+                        <label style="color: #6b7280; display: block; margin-bottom: 0.5rem;">Max Yaş</label>
+                        <input type="number"
+                               v-model="searchFilters.maxAge"
+                               v-on:input="updateAgeRange"
+                               class="age-input"
+                               placeholder="65"
+                               min="18"
+                               max="65" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Adım: Çalışma Durumu -->
+        <div class="step-item" :class="{ 'active': currentStep === 4, 'completed': currentStep > 4, 'disabled': currentStep < 4 }">
+            <div class="step-header">
+                <div class="step-number">
+                    <i v-if="currentStep > 4" class="fas fa-check"></i>
+                    <span v-else>4</span>
+                </div>
+                <h3 class="step-title">Çalışma Durumu</h3>
+            </div>
+            <div class="step-content" v-if="currentStep >= 4">
+                <div class="option-grid">
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.includeWorking }"
+                         v-on:click="toggleWorking">
+                        <i class="fas fa-briefcase option-icon"></i>
+                        <h4 class="option-title">Çalışanlar</h4>
+                        <p class="option-subtitle">Şu anda çalışmakta olan personel</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.includeAvailable }"
+                         v-on:click="toggleAvailable">
+                        <i class="fas fa-user-check option-icon"></i>
+                        <h4 class="option-title">Müsaitler</h4>
+                        <p class="option-subtitle">İşe başlamaya hazır personel</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Adım: Vardiya Uygunluğu -->
+        <div class="step-item" :class="{ 'active': currentStep === 5, 'completed': currentStep > 5, 'disabled': currentStep < 5 }">
+            <div class="step-header">
+                <div class="step-number">
+                    <i v-if="currentStep > 5" class="fas fa-check"></i>
+                    <span v-else>5</span>
+                </div>
+                <h3 class="step-title">Vardiya Çalışması</h3>
+            </div>
+            <div class="step-content" v-if="currentStep >= 5">
+                <div class="option-grid">
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.shiftAvailable }"
+                         v-on:click="toggleShift">
+                        <i class="fas fa-clock option-icon"></i>
+                        <h4 class="option-title">Vardiya Uygun</h4>
+                        <p class="option-subtitle">Vardiya çalışmasına uygun personel</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="option-card"
+                         :class="{ 'selected': !searchFilters.shiftAvailable && searchFilters.shiftSelected }"
+                         v-on:click="toggleShiftNormal">
+                        <i class="fas fa-sun option-icon"></i>
+                        <h4 class="option-title">Normal Mesai</h4>
+                        <p class="option-subtitle">Sadece normal mesai saatlerinde</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Adım: Güvenlik Türü -->
+        <div class="step-item" :class="{ 'active': currentStep === 6, 'completed': currentStep > 6, 'disabled': currentStep < 6 }">
+            <div class="step-header">
+                <div class="step-number">
+                    <i v-if="currentStep > 6" class="fas fa-check"></i>
+                    <span v-else>6</span>
+                </div>
+                <h3 class="step-title">Güvenlik Türü</h3>
+            </div>
+            <div class="step-content" v-if="currentStep >= 6">
+                <div class="option-grid">
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.gunType === 'armed' }"
+                         v-on:click="selectGunType('armed')">
+                        <i class="fas fa-crosshairs option-icon"></i>
+                        <h4 class="option-title">Silahlı Güvenlik</h4>
+                        <p class="option-subtitle">Silahlı güvenlik personeli</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.gunType === 'unarmed' }"
+                         v-on:click="selectGunType('unarmed')">
+                        <i class="fas fa-shield-alt option-icon"></i>
+                        <h4 class="option-title">Silahsız Güvenlik</h4>
+                        <p class="option-subtitle">Silahsız güvenlik personeli</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="option-card"
+                         :class="{ 'selected': searchFilters.gunType === 'both' }"
+                         v-on:click="selectGunType('both')">
+                        <i class="fas fa-users option-icon"></i>
+                        <h4 class="option-title">Hepsi</h4>
+                        <p class="option-subtitle">Silahlı ve silahsız personel</p>
+                        <div class="selected-indicator">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arama Butonu -->
+    <button class="search-btn"
+            :disabled="!canSearch || isSearching"
+            v-on:click="searchPersonnel">
+        <span v-if="!isSearching">
+            <i class="fas fa-search"></i> Personel Ara
+        </span>
+        <span v-else>
+            <span class="loading"></span> Aranıyor...
+        </span>
+    </button>
+
+    <!-- Sonuçlar -->
+    <div v-if="showResults" class="results-section">
+        <div class="results-header">
+            <h2 class="results-title">Arama Sonuçları</h2>
+            <div class="results-count">{{ filteredPersonnel.length }} Personel Bulundu</div>
+        </div>
+
+        <div v-if="filteredPersonnel.length > 0" class="results-grid">
+            <div v-for="person in filteredPersonnel" :key="person.id" class="person-card">
+                <!-- Sol taraf - Fotoğraf -->
+                <div class="person-photo">
+                    <img v-if="person.imagePath"
+                         :src="person.imagePath"
+                         :alt="person.cardName + ' ' + person.lastName" />
+                    <i v-else class="fas fa-user person-photo-placeholder"></i>
+                </div>
+
+                <!-- Orta ve sağ taraf - İçerik -->
+                <div class="person-content">
+                    <!-- Sol taraf - Bilgiler -->
+                    <div class="person-left">
+                        <h3 class="person-name">{{ person.cardName }} {{ person.lastName }}</h3>
+
+                        <div class="person-details">
+                            <div class="detail-item">
+                                <i class="fas fa-phone detail-icon"></i>
+                                <span>{{ formatPhoneDisplay(person.phoneNumber) }}</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt detail-icon"></i>
+                                <span>{{ person.city }}</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-birthday-cake detail-icon"></i>
+                                <span>{{ person.yearsOld }} yaşında</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-user-tie detail-icon"></i>
+                                <span>{{ person.isAdvice ? 'Danışma/Karşılama' : 'Güvenlik' }}</span>
+                            </div>
+
+                            <div v-if="!person.isAdvice" class="detail-item">
+                                <i class="fas fa-shield-alt detail-icon"></i>
+                                <span>{{ person.gun ? 'Silahlı' : 'Silahsız' }} Güvenlik</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sağ taraf - Durumlar ve İletişim -->
+                    <div class="person-right">
+                        <div class="status-badges">
+                            <span v-if="person.isAdvice" class="status-badge status-advice">
+                                <i class="fas fa-user-tie"></i> Danışma
+                            </span>
+                            <span v-else class="status-badge status-security">
+                                <i class="fas fa-shield-alt"></i> Güvenlik
+                            </span>
+                            <span v-if="!person.working" class="status-badge status-available">
+                                <i class="fas fa-check-circle"></i> Müsait
+                            </span>
+                            <span v-if="person.working" class="status-badge status-working">
+                                <i class="fas fa-briefcase"></i> Çalışıyor
+                            </span>
+                            <span v-if="person.shift" class="status-badge status-shift">
+                                <i class="fas fa-clock"></i> Vardiya Uygun
+                            </span>
+                            <span v-if="!person.isAdvice && person.gun" class="status-badge status-armed">
+                                <i class="fas fa-crosshairs"></i> Silahlı
+                            </span>
+                            <span v-if="!person.isAdvice && !person.gun" class="status-badge status-unarmed">
+                                <i class="fas fa-shield-alt"></i> Silahsız
+                            </span>
+                        </div>
+
+                        <button class="contact-btn" v-on:click="contactPerson(person)">
+                            <i class="fas fa-phone"></i>
+                            İletişim
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else class="no-results">
+            <i class="fas fa-search"></i>
+            <p>Arama kriterlerinize uygun personel bulunamadı.</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                currentStep: 1,
+                searchFilters: {
+                    city: '',
+                    minAge: 18,
+                    maxAge: 65,
+                    includeWorking: false,
+                    includeAvailable: false,
+                    shiftAvailable: false,
+                    shiftSelected: false,
+                    gunType: '',
+                    positionType: ''
+                },
+                isSearching: false,
+                showResults: false,
+                filteredPersonnel: [],
+                cities: [
+                    'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin',
+                    'Aydın', 'Balıkesir', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa',
+                    'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Edirne', 'Elazığ', 'Erzincan',
+                    'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Isparta',
+                    'Mersin', 'İstanbul', 'İzmir', 'Kars', 'Kastamonu', 'Kayseri', 'Kırklareli', 'Kırşehir',
+                    'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Kahramanmaraş', 'Mardin', 'Muğla',
+                    'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop',
+                    'Sivas', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Şanlıurfa', 'Uşak', 'Van',
+                    'Yozgat', 'Zonguldak', 'Aksaray', 'Bayburt', 'Karaman', 'Kırıkkale', 'Batman', 'Şırnak',
+                    'Bartın', 'Ardahan', 'Iğdır', 'Yalova', 'Karabük', 'Kilis', 'Osmaniye', 'Düzce'
+                ]
+            }
+        },
+        computed: {
+            canSearch() {
+                return this.currentStep >= 7;
+            }
+        },
+        methods: {
+            selectCity() {
+                if (this.searchFilters.city) {
+                    this.nextStep();
+                }
+            },
+
+            selectPositionType(type) {
+                this.searchFilters.positionType = type;
+                if (this.currentStep === 2) {
+                    this.nextStep();
+                }
+            },
+
+            updateAgeRange() {
+                if (this.searchFilters.minAge && this.searchFilters.maxAge) {
+                    if (this.searchFilters.minAge > this.searchFilters.maxAge) {
+                        this.searchFilters.maxAge = this.searchFilters.minAge;
+                    }
+                }
+
+                if (this.searchFilters.minAge >= 18 &&
+                    this.searchFilters.maxAge >= 18 &&
+                    this.searchFilters.minAge <= this.searchFilters.maxAge &&
+                    this.currentStep === 3) {
+                    this.nextStep();
+                }
+            },
+
+            toggleWorking() {
+                this.searchFilters.includeWorking = !this.searchFilters.includeWorking;
+                this.checkWorkingStep();
+            },
+
+            toggleAvailable() {
+                this.searchFilters.includeAvailable = !this.searchFilters.includeAvailable;
+                this.checkWorkingStep();
+            },
+
+            checkWorkingStep() {
+                if ((this.searchFilters.includeWorking || this.searchFilters.includeAvailable) &&
+                    this.currentStep === 4) {
+                    this.nextStep();
+                }
+            },
+
+            toggleShift() {
+                this.searchFilters.shiftAvailable = true;
+                this.searchFilters.shiftSelected = true;
+                if (this.currentStep === 5) {
+                    this.nextStep();
+                }
+            },
+
+            toggleShiftNormal() {
+                this.searchFilters.shiftAvailable = false;
+                this.searchFilters.shiftSelected = true;
+                if (this.currentStep === 5) {
+                    this.nextStep();
+                }
+            },
+
+            nextStep() {
+                if (this.currentStep < 7) {
+                    this.currentStep++;
+                }
+            },
+
+            selectGunType(type) {
+                this.searchFilters.gunType = type;
+                if (this.currentStep === 6) {
+                    this.nextStep();
+                }
+            },
+
+            formatPhoneDisplay(phone) {
+                if (!phone) return '';
+                let cleanPhone = phone.replace(/\D/g, '');
+
+                if (cleanPhone.length === 11) {
+                    return cleanPhone.substring(0, 4) + ' ' +
+                           cleanPhone.substring(4, 7) + ' ' +
+                           cleanPhone.substring(7, 9) + ' ' +
+                           cleanPhone.substring(9);
+                }
+                return phone;
+            },
+
+            contactPerson(person) {
+                Swal.fire({
+                    title: `${person.cardName} ${person.lastName}`,
+                    html: `
+                        <div style="text-align: left; margin: 1rem 0;">
+                            <p style="margin: 0.5rem 0;"><strong>Telefon:</strong> ${this.formatPhoneDisplay(person.phoneNumber)}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Şehir:</strong> ${person.city}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Yaş:</strong> ${person.yearsOld}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Pozisyon:</strong> ${person.isAdvice ? 'Danışma/Karşılama' : 'Güvenlik Personeli'}</p>
+                            ${!person.isAdvice ? `<p style="margin: 0.5rem 0;"><strong>Güvenlik:</strong> ${person.gun ? 'Silahlı' : 'Silahsız'}</p>` : ''}
+                            <p style="margin: 0.5rem 0;"><strong>Durum:</strong> ${person.working ? 'Çalışıyor' : 'Müsait'}</p>
+                            ${person.shift ? '<p style="margin: 0.5rem 0; color: #3b82f6;"><strong>Vardiya çalışmasına uygun</strong></p>' : ''}
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: `<i class="fas fa-phone"></i> ${this.formatPhoneDisplay(person.phoneNumber)}`,
+                    cancelButtonText: 'Kapat',
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    width: '400px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `tel:${person.phoneNumber.replace(/\D/g, '')}`;
+                    }
+                });
+            },
+
+            async searchPersonnel() {
+                this.isSearching = true;
+
+                try {
+                    const searchParams = {
+                        city: this.searchFilters.city,
+                        minAge: this.searchFilters.minAge,
+                        maxAge: this.searchFilters.maxAge,
+                        includeWorking: this.searchFilters.includeWorking,
+                        includeAvailable: this.searchFilters.includeAvailable,
+                        shiftAvailable: this.searchFilters.shiftAvailable,
+                        gunType: this.searchFilters.gunType,
+                        positionType: this.searchFilters.positionType
+                    };
+
+                    const response = await fetch('/SearchPersonel/Search', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(searchParams)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.filteredPersonnel = result.data;
+                        this.showResults = true;
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Arama Hatası',
+                            text: result.message || 'Arama sırasında bir hata oluştu.',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Bağlantı Hatası',
+                        text: 'Sunucuya bağlanılamadı. Lütfen daha sonra tekrar deneyin.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                } finally {
+                    this.isSearching = false;
+                }
+            }
+        }
+    }).mount('#searchApp');
+</script>

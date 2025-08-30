@@ -1,0 +1,1160 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Admin Yönetimi";
+}
+
+<div id="adminApp" class="admin-management-page">
+    <!-- Page Header -->
+    <div class="page-header-section">
+        <div class="header-content">
+            <div class="header-info">
+                <div class="header-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Admin Yönetimi</h1>
+                    <p>Sistem adminlerini yönetin ve yetkilendirin</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="stats-summary">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ admins.length }}</div>
+                        <div class="stat-label">Toplam Admin</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ activeAdmins }}</div>
+                        <div class="stat-label">Aktif Admin</div>
+                    </div>
+                </div>
+                <button class="add-admin-btn"v-on:click="openAddModal">
+                    <i class="fas fa-plus"></i>
+                    <span>Yeni Admin</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       class="search-input" 
+                       v-model="searchQuery"
+                       placeholder="Admin ara... (isim, kullanıcı adı, telefon)">
+                <div class="search-clear"v-on:click="searchQuery = ''" v-if="searchQuery">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="filter-controls">
+            <select class="filter-select" v-model="statusFilter">
+                <option value="">Tüm Durumlar</option>
+                <option value="active">Sadece Aktif</option>
+                <option value="passive">Sadece Pasif</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Admins Grid -->
+    <div class="admins-grid" v-if="filteredAdmins.length > 0">
+        <div class="admin-card" v-for="admin in filteredAdmins" :key="admin.ref">
+            <div class="admin-card-header">
+                <div class="admin-avatar-section">
+                    <div class="admin-avatar">
+                        {{ getInitials(admin) }}
+                    </div>
+                    <div class="status-indicator" :class="admin.isPassive ? 'status-inactive' : 'status-active'"></div>
+                </div>
+                <div class="admin-actions">
+                    <button class="action-btn edit-btn"v-on:click="openEditModal(admin)" title="Düzenle">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn"v-on:click="deleteAdmin(admin)" title="Sil">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-card-body">
+                <div class="admin-name">{{ admin.cardName }} {{ admin.lastName }}</div>
+@*                 <div class="admin-username">@{{ admin.userName }}</div>
+ *@                
+                <div class="admin-details">
+                    <div class="detail-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ formatPhone(admin.phoneNumber) || 'Telefon yok' }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <i class="fas fa-circle" :class="admin.isPassive ? 'text-danger' : 'text-success'"></i>
+                        <span>{{ admin.isPassive ? 'Pasif' : 'Aktif' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h3>{{ searchQuery ? 'Admin Bulunamadı' : 'Henüz Admin Yok' }}</h3>
+        <p v-if="searchQuery">Arama kriterlerinize uygun admin bulunamadı.</p>
+        <p v-else>Sisteme henüz admin kaydı eklenmemiş.</p>
+        <button class="empty-action-btn"v-on:click="openAddModal" v-if="!searchQuery">
+            <i class="fas fa-plus"></i>
+            İlk Admin'i Ekle
+        </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-backdrop" v-if="showModal"v-on:click.self="closeModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>{{ editMode ? 'Admin Düzenle' : 'Yeni Admin Ekle' }}</h2>
+                <button class="modal-close"v-on:click="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form v-on:submit.prevent="saveAdmin" class="modal-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ad *</label>
+                        <input type="text" 
+                               class="form-input" 
+                               v-model="formData.cardName" 
+                               required 
+                               placeholder="Adınız">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Soyad *</label>
+                        <input type="text" 
+                               class="form-input" 
+                               v-model="formData.lastName" 
+                               required 
+                               placeholder="Soyadınız">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kullanıcı Adı *</label>
+                    <input type="text" 
+                           class="form-input" 
+                           v-model="formData.userName" 
+                           required 
+                           placeholder="Benzersiz kullanıcı adı">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Şifre *</label>
+                    <input type="password" 
+                           class="form-input" 
+                           v-model="formData.userPassword" 
+                           required 
+                           placeholder="Güvenli şifre">
+                    <div class="form-help" v-if="editMode">
+                        Şifre güncellemek istemiyorsanız boş bırakın
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Telefon Numarası</label>
+                    <input type="tel" 
+                           class="form-input" 
+                           v-model="formData.phoneNumber" 
+                           placeholder="05XX XXX XX XX">
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" 
+                               id="isPassive"
+                               v-model="formData.isPassive"
+                               class="checkbox-input">
+                        <label for="isPassive" class="checkbox-label">
+                            <div class="checkbox-box">
+                                <i class="fas fa-check checkbox-check"></i>
+                            </div>
+                            <span>Pasif durumda (Giriş yapamaz)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel"v-on:click="closeModal">
+                        <i class="fas fa-times"></i>
+                        İptal
+                    </button>
+                    <button type="submit" class="btn btn-save" :disabled="loading">
+                        <i class="fas fa-save" v-if="!loading"></i>
+                        <div class="btn-spinner" v-if="loading"></div>
+                        {{ editMode ? 'Güncelle' : 'Kaydet' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-backdrop" v-if="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Lütfen bekleyin...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #3b82f6;
+        --primary-indigo: #6366f1;
+        --success-green: #10b981;
+        --danger-red: #ef4444;
+        --warning-yellow: #f59e0b;
+        
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e0;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .admin-management-page {
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        min-height: calc(100vh - 70px);
+    }
+
+    /* Page Header */
+    .page-header-section {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray-200);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .header-info {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.75rem;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .header-text h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+
+    .header-text p {
+        color: var(--gray-500);
+        font-size: 1.125rem;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .stats-summary {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .stat-card {
+        text-align: center;
+        padding: 1rem 1.5rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-200);
+    }
+
+    .stat-value {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+
+    .add-admin-btn {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-md);
+    }
+
+    .add-admin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    /* Controls Section */
+    .controls-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .search-container {
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-box {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        color: var(--gray-700);
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        font-size: 1rem;
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        cursor: pointer;
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+    .search-clear:hover {
+        background: var(--gray-200);
+        color: var(--gray-600);
+    }
+
+    .filter-controls {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .filter-select {
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        color: var(--gray-700);
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Admins Grid */
+    .admins-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .admin-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--primary-blue);
+    }
+
+    .admin-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .admin-avatar-section {
+        position: relative;
+    }
+
+    .admin-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+        box-shadow: var(--shadow-md);
+    }
+
+    .status-indicator {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 3px solid white;
+    }
+
+    .status-active {
+        background: var(--success-green);
+    }
+
+    .status-inactive {
+        background: var(--gray-400);
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+    }
+
+    .edit-btn {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-blue);
+    }
+
+    .edit-btn:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .delete-btn {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-red);
+    }
+
+    .delete-btn:hover {
+        background: var(--danger-red);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .admin-card-body {
+        padding: 1.5rem;
+    }
+
+    .admin-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .admin-username {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+
+    .admin-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+    }
+
+    .detail-item i {
+        width: 1rem;
+        flex-shrink: 0;
+    }
+
+    .text-success {
+        color: var(--success-green);
+    }
+
+    .text-danger {
+        color: var(--danger-red);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--gray-500);
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        border: 2px dashed var(--gray-300);
+        margin: 2rem 0;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--gray-300);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .empty-action-btn {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-indigo) 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .empty-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(8px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        padding: 1rem;
+    }
+
+    .modal-container {
+        background: white;
+        border-radius: var(--radius-xl);
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0;
+    }
+
+    .modal-close {
+        width: 2rem;
+        height: 2rem;
+        border: none;
+        background: var(--gray-100);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--gray-500);
+        transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .modal-form {
+        padding: 2rem;
+        overflow-y: auto;
+        max-height: calc(90vh - 200px);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        color: var(--gray-700);
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-input::placeholder {
+        color: var(--gray-400);
+    }
+
+    .form-help {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .checkbox-input {
+        display: none;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: var(--gray-700);
+    }
+
+    .checkbox-box {
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid var(--gray-300);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .checkbox-check {
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.2s ease;
+        font-size: 0.75rem;
+        color: white;
+    }
+
+    .checkbox-input:checked + .checkbox-label .checkbox-box {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+
+    .checkbox-input:checked + .checkbox-label .checkbox-check {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 2rem;
+        background: var(--gray-50);
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        min-width: 100px;
+        justify-content: center;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-cancel {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .btn-cancel:hover:not(:disabled) {
+        background: var(--gray-300);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+        color: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-save:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-spinner {
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    /* Loading */
+    .loading-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    }
+
+    .loading-content {
+        text-align: center;
+        color: white;
+    }
+
+    .loading-spinner {
+        width: 3rem;
+        height: 3rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    .loading-content p {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+
+ 
+
+  
+</style>
+
+<!-- Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                admins: [],
+                searchQuery: '',
+                statusFilter: '',
+                showModal: false,
+                editMode: false,
+                loading: false,
+                formData: {
+                    ref: null,
+                    cardName: '',
+                    lastName: '',
+                    userName: '',
+                    userPassword: '',
+                    phoneNumber: '',
+                    isPassive: false
+                }
+            }
+        },
+        computed: {
+            filteredAdmins() {
+                let filtered = this.admins;
+
+                // Status filter
+                if (this.statusFilter === 'active') {
+                    filtered = filtered.filter(admin => !admin.isPassive);
+                } else if (this.statusFilter === 'passive') {
+                    filtered = filtered.filter(admin => admin.isPassive);
+                }
+
+                // Search filter
+                if (this.searchQuery) {
+                    const query = this.searchQuery.toLowerCase();
+                    filtered = filtered.filter(admin => {
+                        const fullName = `${admin.cardName || ''} ${admin.lastName || ''}`.toLowerCase();
+                        const userName = (admin.userName || '').toLowerCase();
+                        const phone = (admin.phoneNumber || '').toLowerCase();
+                        
+                        return fullName.includes(query) || 
+                               userName.includes(query) || 
+                               phone.includes(query);
+                    });
+                }
+
+                return filtered;
+            },
+
+            activeAdmins() {
+                return this.admins.filter(admin => !admin.isPassive).length;
+            }
+        },
+        methods: {
+            async loadAdmins() {
+                this.loading = true;
+                try {
+                    const response = await fetch('/Users/GetAllAdmins');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.admins = data.data;
+                    } else {
+                        this.showError('Adminler yüklenirken bir hata oluştu.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showError('Bağlantı hatası oluştu.');
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            openAddModal() {
+                this.editMode = false;
+                this.resetForm();
+                this.showModal = true;
+            },
+
+            openEditModal(admin) {
+                this.editMode = true;
+                this.formData = {
+                    ref: admin.ref,
+                    cardName: admin.cardName,
+                    lastName: admin.lastName,
+                    userName: admin.userName,
+                    userPassword: '', // Şifre alanını boş bırak
+                    phoneNumber: admin.phoneNumber,
+                    isPassive: admin.isPassive
+                };
+                this.showModal = true;
+            },
+
+            closeModal() {
+                this.showModal = false;
+                this.resetForm();
+            },
+
+            resetForm() {
+                this.formData = {
+                    ref: null,
+                    cardName: '',
+                    lastName: '',
+                    userName: '',
+                    userPassword: '',
+                    phoneNumber: '',
+                    isPassive: false
+                };
+            },
+
+            async saveAdmin() {
+                if (!this.validateForm()) return;
+
+                this.loading = true;
+                const url = this.editMode ? '/Users/UpdateAdmin' : '/Users/CreateAdmin';
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(this.formData)
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Başarılı!',
+                            text: this.editMode ? 'Admin başarıyla güncellendi.' : 'Yeni admin başarıyla eklendi.',
+                            timer: 2000,
+                            showConfirmButton: false,
+                            toast: true,
+                            position: 'top-end'
+                        });
+                        
+                        this.closeModal();
+                        await this.loadAdmins();
+                    } else {
+                        this.showError(data.message || 'İşlem sırasında bir hata oluştu.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.showError('Bağlantı hatası oluştu.');
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async deleteAdmin(admin) {
+                const result = await Swal.fire({
+                    title: 'Admin Sil',
+                    html: `<strong>${admin.cardName} ${admin.lastName}</strong> adlı admini silmek istediğinizden emin misiniz?<br><br><small style="color: #dc3545;">Bu işlem geri alınamaz!</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-trash"></i> Evet, Sil',
+                    cancelButtonText: '<i class="fas fa-times"></i> İptal',
+                    reverseButtons: true
+                });
+
+                if (result.isConfirmed) {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/Users/DeleteAdmin', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ adminId: admin.ref })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Silindi!',
+                                text: 'Admin başarıyla silindi.',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                toast: true,
+                                position: 'top-end'
+                            });
+                            
+                            await this.loadAdmins();
+                        } else {
+                            this.showError(data.message || 'Silme işlemi sırasında bir hata oluştu.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.showError('Bağlantı hatası oluştu.');
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            },
+
+            validateForm() {
+                if (!this.formData.cardName || !this.formData.lastName || !this.formData.userName) {
+                    this.showError('Ad, Soyad ve Kullanıcı Adı alanları zorunludur.');
+                    return false;
+                }
+
+                if (!this.editMode && !this.formData.userPassword) {
+                    this.showError('Şifre alanı zorunludur.');
+                    return false;
+                }
+
+                return true;
+            },
+
+            getInitials(admin) {
+                const first = admin.cardName ? admin.cardName.charAt(0).toUpperCase() : '';
+                const last = admin.lastName ? admin.lastName.charAt(0).toUpperCase() : '';
+                return first + last || 'A';
+            },
+
+            formatPhone(phone) {
+                if (!phone) return '';
+                const cleaned = phone.replace(/\D/g, '');
+                if (cleaned.length === 11) {
+                    return `${cleaned.substr(0, 4)} ${cleaned.substr(4, 3)} ${cleaned.substr(7, 2)} ${cleaned.substr(9)}`;
+                }
+                return phone;
+            },
+
+            showError(message) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: message,
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Tamam'
+                });
+            }
+        },
+        mounted() {
+            this.loadAdmins();
+        }
+    }).mount('#adminApp');
+</script>
