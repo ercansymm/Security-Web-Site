@@ -7,6 +7,164 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+
+    /* KVKK Modal Styles */
+    .kvkk-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+    }
+
+    .kvkk-modal-content {
+        background-color: white;
+        margin: 3% auto;
+        padding: 0;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    .kvkk-modal-header {
+        padding: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .kvkk-modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .kvkk-close {
+        color: #9ca3af;
+        font-size: 1.5rem;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+        .kvkk-close:hover {
+            color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+    .kvkk-modal-body {
+        padding: 2rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .kvkk-text {
+        color: #374151;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+        .kvkk-text h3 {
+            color: #1f2937;
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .kvkk-text p {
+            margin-bottom: 1rem;
+        }
+
+        .kvkk-text ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .kvkk-text li {
+            margin: 0.5rem 0;
+        }
+
+    .kvkk-modal-footer {
+        padding: 2rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .kvkk-checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .kvkk-checkbox {
+        width: 20px;
+        height: 20px;
+        accent-color: #3b82f6;
+        cursor: pointer;
+    }
+
+    .kvkk-checkbox-label {
+        color: #374151;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .kvkk-accept-btn {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+        .kvkk-accept-btn.enabled {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+            .kvkk-accept-btn.enabled:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            }
+
+
+
+    /* Form submit button disabled state */
+    .submit-btn.kvkk-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #9ca3af;
+    }
     /* Mevcut stiller aynen korunuyor */
     .form-container {
         max-width: 900px;
@@ -385,12 +543,1061 @@
     .radio-group:hover .radio-label {
         color: #1f2937;
     }
+
+
+
+        /* Spin ve modal animasyonları */
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @@keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tablet ve küçük laptop için (1024px ve altı) */
+        @@media (max-width: 1024px) {
+            .form-container {
+                margin: 1.5rem auto;
+                padding: 2.5rem;
+            }
+
+            .page-title {
+                font-size: 2.5rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .form-grid {
+                gap: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .file-upload-section {
+                grid-template-columns: 1fr 250px;
+                gap: 1.5rem;
+            }
+
+            .image-preview {
+                width: 250px;
+                height: 250px;
+            }
+
+            .benefits-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+                margin-top: 2.5rem;
+            }
+
+            /* KVKK Modal */
+            .kvkk-modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+
+            .kvkk-modal-header,
+            .kvkk-modal-body,
+            .kvkk-modal-footer {
+                padding: 1.75rem;
+            }
+        }
+
+        /* Tablet için (768px ve altı) */
+        @@media (max-width: 768px) {
+            .form-container {
+                margin: 1rem auto;
+                padding: 2rem;
+                border-radius: 12px;
+            }
+
+            .page-title {
+                font-size: 2.25rem;
+                margin-bottom: 2rem;
+            }
+
+            .page-title::after {
+                width: 80px;
+                height: 3px;
+                bottom: -8px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .form-group {
+                margin-bottom: 0;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 0.875rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .checkbox-container,
+            .radio-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1.25rem;
+            }
+
+            .file-upload-section {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .image-preview {
+                width: 200px;
+                height: 200px;
+                margin: 0 auto;
+            }
+
+            .file-label {
+                padding: 2rem;
+                min-height: 150px;
+            }
+
+            .file-icon {
+                font-size: 2rem;
+            }
+
+            .submit-btn {
+                padding: 1rem 2.5rem;
+                font-size: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .benefits-section {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-top: 2rem;
+                padding-top: 1.5rem;
+            }
+
+            /* KVKK Modal */
+            .kvkk-modal-content {
+                width: 95%;
+                max-width: none;
+                margin: 2% auto;
+                max-height: 95vh;
+            }
+
+            .kvkk-modal-header {
+                padding: 1.5rem;
+            }
+
+            .kvkk-modal-title {
+                font-size: 1.25rem;
+            }
+
+            .kvkk-modal-body {
+                padding: 1.5rem;
+            }
+
+            .kvkk-modal-footer {
+                padding: 1.5rem;
+            }
+
+            .kvkk-text {
+                font-size: 0.9rem;
+            }
+
+            .kvkk-text h3 {
+                font-size: 1rem;
+                margin: 1.25rem 0 0.75rem 0;
+            }
+        }
+
+        /* Büyük telefon için (640px ve altı) */
+        @@media (max-width: 640px) {
+            .form-container {
+                margin: 0.75rem auto;
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+                margin-bottom: 1.75rem;
+            }
+
+            .page-title::after {
+                width: 60px;
+            }
+
+            .form-grid {
+                gap: 1rem;
+            }
+
+            .form-label {
+                font-size: 0.95rem;
+                margin-bottom: 0.6rem;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .checkbox-container,
+            .radio-container {
+                padding: 1rem;
+            }
+
+            .checkbox-label,
+            .radio-label {
+                font-size: 0.95rem;
+            }
+
+            .checkbox-input,
+            .radio-input {
+                width: 18px;
+                height: 18px;
+            }
+
+            .file-label {
+                padding: 1.5rem;
+                min-height: 120px;
+            }
+
+            .file-icon {
+                font-size: 1.75rem;
+            }
+
+            .file-label small {
+                font-size: 0.8rem;
+            }
+
+            .image-preview {
+                width: 150px;
+                height: 150px;
+            }
+
+            .remove-image {
+                width: 28px;
+                height: 28px;
+                font-size: 0.75rem;
+            }
+
+            .submit-btn {
+                padding: 0.875rem 2rem;
+                font-size: 0.95rem;
+            }
+
+            .benefits-section {
+                gap: 0.875rem;
+                margin-top: 1.75rem;
+            }
+
+            .benefit-item {
+                gap: 0.6rem;
+                font-size: 0.9rem;
+            }
+
+            .benefit-icon {
+                font-size: 1rem;
+            }
+
+            /* KVKK Modal */
+            .kvkk-modal-content {
+                margin: 1% auto;
+                width: 98%;
+                max-height: 98vh;
+            }
+
+            .kvkk-modal-header,
+            .kvkk-modal-body,
+            .kvkk-modal-footer {
+                padding: 1.25rem;
+            }
+
+            .kvkk-modal-title {
+                font-size: 1.125rem;
+            }
+
+            .kvkk-close {
+                width: 1.75rem;
+                height: 1.75rem;
+                font-size: 1.25rem;
+            }
+
+            .kvkk-text {
+                font-size: 0.85rem;
+            }
+
+            .kvkk-text h3 {
+                font-size: 0.95rem;
+            }
+
+            .kvkk-checkbox-group {
+                padding: 0.875rem;
+            }
+
+            .kvkk-checkbox {
+                width: 18px;
+                height: 18px;
+            }
+
+            .kvkk-checkbox-label {
+                font-size: 0.9rem;
+            }
+
+            .kvkk-accept-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Küçük telefon için (480px ve altı) */
+        @@media (max-width: 480px) {
+            .form-container {
+                margin: 0.5rem auto;
+                padding: 1.25rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-grid {
+                gap: 0.875rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+                gap: 0.375rem;
+            }
+
+            .form-label i {
+                font-size: 0.8rem;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 0.625rem 0.875rem;
+                font-size: 0.85rem;
+            }
+
+            .form-select {
+                background-size: 1.25rem;
+                padding-right: 2.5rem;
+            }
+
+            .checkbox-container,
+            .radio-container {
+                padding: 0.875rem;
+                gap: 0.75rem;
+            }
+
+            .checkbox-group,
+            .radio-group {
+                gap: 0.5rem;
+            }
+
+            .checkbox-input,
+            .radio-input {
+                width: 16px;
+                height: 16px;
+            }
+
+            .checkbox-label,
+            .radio-label {
+                font-size: 0.85rem;
+            }
+
+            .file-upload-section {
+                gap: 1rem;
+            }
+
+            .file-label {
+                padding: 1.25rem;
+                min-height: 100px;
+                gap: 0.75rem;
+            }
+
+            .file-icon {
+                font-size: 1.5rem;
+            }
+
+            .file-label small {
+                font-size: 0.75rem;
+            }
+
+            .image-preview {
+                width: 120px;
+                height: 120px;
+            }
+
+            .remove-image {
+                width: 26px;
+                height: 26px;
+                font-size: 0.7rem;
+                top: 8px;
+                right: 8px;
+            }
+
+            .submit-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.875rem;
+                gap: 0.375rem;
+            }
+
+            .benefits-section {
+                gap: 0.75rem;
+                margin-top: 1.5rem;
+                padding-top: 1.25rem;
+            }
+
+            .benefit-item {
+                gap: 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .benefit-icon {
+                font-size: 0.95rem;
+            }
+
+            /* KVKK Modal */
+            .kvkk-modal-content {
+                margin: 0.5% auto;
+                width: 99%;
+                max-height: 99vh;
+            }
+
+            .kvkk-modal-header,
+            .kvkk-modal-body,
+            .kvkk-modal-footer {
+                padding: 1rem;
+            }
+
+            .kvkk-modal-title {
+                font-size: 1rem;
+            }
+
+            .kvkk-close {
+                width: 1.5rem;
+                height: 1.5rem;
+                font-size: 1.125rem;
+            }
+
+            .kvkk-text {
+                font-size: 0.8rem;
+                line-height: 1.6;
+            }
+
+            .kvkk-text h3 {
+                font-size: 0.9rem;
+                margin: 1rem 0 0.5rem 0;
+            }
+
+            .kvkk-text ul {
+                padding-left: 1.25rem;
+            }
+
+            .kvkk-checkbox-group {
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .kvkk-checkbox {
+                width: 16px;
+                height: 16px;
+            }
+
+            .kvkk-checkbox-label {
+                font-size: 0.8rem;
+                line-height: 1.4;
+            }
+
+            .kvkk-accept-btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.85rem;
+                gap: 0.375rem;
+            }
+        }
+
+        /* Çok küçük telefon için (360px ve altı) */
+        @@media (max-width: 360px) {
+            .form-container {
+                margin: 0.25rem auto;
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .form-grid {
+                gap: 0.75rem;
+            }
+
+            .form-label {
+                font-size: 0.85rem;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .checkbox-container,
+            .radio-container {
+                padding: 0.75rem;
+            }
+
+            .checkbox-label,
+            .radio-label {
+                font-size: 0.8rem;
+            }
+
+            .file-label {
+                padding: 1rem;
+                min-height: 80px;
+            }
+
+            .file-icon {
+                font-size: 1.25rem;
+            }
+
+            .image-preview {
+                width: 100px;
+                height: 100px;
+            }
+
+            .submit-btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.8rem;
+            }
+
+            .benefit-item {
+                font-size: 0.8rem;
+                gap: 0.375rem;
+            }
+
+            .benefit-icon {
+                font-size: 0.875rem;
+            }
+
+            /* KVKK Modal */
+            .kvkk-modal-header,
+            .kvkk-modal-body,
+            .kvkk-modal-footer {
+                padding: 0.875rem;
+            }
+
+            .kvkk-modal-title {
+                font-size: 0.95rem;
+            }
+
+            .kvkk-text {
+                font-size: 0.75rem;
+            }
+
+            .kvkk-text h3 {
+                font-size: 0.85rem;
+            }
+
+            .kvkk-checkbox-label {
+                font-size: 0.75rem;
+            }
+
+            .kvkk-accept-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Landscape tablet için özel ayarlar */
+        @@media (max-width: 1024px) and (orientation: landscape) and (max-height: 768px) {
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .benefits-section {
+                grid-template-columns: repeat(3, 1fr);
+                margin-top: 1.5rem;
+            }
+
+            .kvkk-modal-content {
+                max-height: 90vh;
+                margin: 2% auto;
+            }
+        }
+
+        /* Touch optimizasyonu */
+        @@media (hover: none) and (pointer: coarse) {
+            .submit-btn:hover,
+            .benefit-item:hover,
+            .file-label:hover,
+            .kvkk-accept-btn:hover,
+            .kvkk-close:hover {
+                transform: none;
+                box-shadow: initial;
+            }
+
+            .submit-btn:active {
+                transform: scale(0.98);
+            }
+
+            .file-label:active {
+                background: #e5f3ff;
+                border-color: #2563eb;
+            }
+
+            .kvkk-accept-btn:active {
+                transform: scale(0.98);
+            }
+
+            /* Touch için daha büyük dokunma alanları */
+            .checkbox-input,
+            .radio-input,
+            .kvkk-checkbox {
+                min-width: 44px;
+                min-height: 44px;
+                -webkit-transform: scale(1.5);
+                transform: scale(1.5);
+            }
+
+            .submit-btn {
+                min-height: 48px;
+                padding: 1rem 2rem;
+            }
+
+            .kvkk-accept-btn {
+                min-height: 48px;
+            }
+
+            .remove-image {
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .kvkk-close {
+                min-width: 44px;
+                min-height: 44px;
+            }
+        }
+
+        /* Print media query */
+        @@media print {
+            .form-container {
+                background: white;
+                box-shadow: none;
+                border: 1px solid #ccc;
+                padding: 2rem;
+            }
+
+            .page-title::after {
+                background: #333;
+            }
+
+            .form-input,
+            .form-select {
+                border: 1px solid #ccc;
+            }
+
+            .checkbox-container,
+            .radio-container {
+                border: 1px solid #ccc;
+            }
+
+            .submit-btn,
+            .kvkk-modal,
+            .file-upload,
+            .remove-image {
+                display: none;
+            }
+
+            .image-preview {
+                border: 1px solid #ccc;
+            }
+
+            .benefits-section {
+                break-inside: avoid;
+            }
+        }
+
+        /* Animasyonlar - Keyframes ekleme */
+        @@keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes pulseGreen {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Animasyon sınıfları */
+        .slide-in-bottom {
+            animation: slideInFromBottom 0.6s ease-out;
+        }
+
+        .scale-in {
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        .pulse-green {
+            animation: pulseGreen 2s infinite;
+        }
+
+        /* Form elemanları için animasyonlar */
+        .form-input:focus,
+        .form-select:focus {
+            animation: scaleIn 0.2s ease-out;
+        }
+
+        .submit-btn:not(:disabled):active {
+            animation: scaleIn 0.1s ease-out;
+        }
+
+        /* KVKK Modal animasyonları */
+        .kvkk-modal {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Reduced motion için */
+        @@media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .submit-btn:hover,
+            .benefit-item:hover,
+            .file-label:hover {
+                transform: none;
+            }
+
+            .kvkk-modal-content {
+                animation: none;
+            }
+
+            .loading {
+                animation: none;
+                border: 2px solid #e5e7eb;
+                border-top-color: #3b82f6;
+            }
+        }
+
+        /* Focus styles mobile için iyileştirme */
+        @@media (max-width: 768px) {
+            .form-input:focus,
+            .form-select:focus {
+                outline: 2px solid #3b82f6;
+                outline-offset: -2px;
+            }
+
+            .submit-btn:focus,
+            .kvkk-accept-btn:focus {
+                outline: 2px solid #3b82f6;
+                outline-offset: 2px;
+            }
+
+            .checkbox-input:focus,
+            .radio-input:focus,
+            .kvkk-checkbox:focus {
+                outline: 2px solid #3b82f6;
+                outline-offset: 2px;
+            }
+        }
+
+        /* Özel mobil düzenlemeler */
+        @@media (max-width: 640px) {
+            /* Form grid özel düzen */
+            .form-group.full-width {
+                grid-column: 1;
+            }
+
+            /* File upload responsive */
+            .file-upload-section {
+                text-align: center;
+            }
+
+            /* Benefits responsive wrap */
+            .benefits-section {
+                text-align: left;
+            }
+
+            .benefit-item {
+                justify-content: flex-start;
+                align-items: flex-start;
+                padding: 0.5rem 0;
+            }
+
+            /* KVKK modal scroll fix */
+            .kvkk-modal-body {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* iOS Safari özel düzeltmeler */
+        @@media screen and (-webkit-min-device-pixel-ratio: 1) {
+            .form-input,
+            .form-select {
+                -webkit-appearance: none;
+                border-radius: 8px;
+            }
+
+            .form-select {
+                background-position: right 1rem center;
+            }
+        }
+
+    /* ===== FORM KONTROL BOYUTLARI DÜZELTİLMESİ - MEVCUT KODLARIN SONUNA EKLE ===== */
+
+    /* Radio button ve checkbox boyutlarını normal boyutlara döndür */
+    .checkbox-input,
+    .radio-input,
+    .kvkk-checkbox {
+        width: 18px !important;
+        height: 18px !important;
+        -webkit-transform: none !important;
+        transform: none !important;
+        min-width: auto !important;
+        min-height: auto !important;
+        cursor: pointer;
+        accent-color: #3b82f6;
+    }
+
+    /* Touch cihazlar için de normal boyut */
+    @@media (hover: none) and (pointer: coarse) {
+        .checkbox-input,
+        .radio-input,
+        .kvkk-checkbox {
+            width: 18px !important;
+            height: 18px !important;
+            -webkit-transform: none !important;
+            transform: none !important;
+            min-width: auto !important;
+            min-height: auto !important;
+        }
+        /* Touch dostu konteyner alanları */
+        .checkbox-group,
+        .radio-group,
+        .kvkk-checkbox-group {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        /* Tıklanabilir alanı genişlet */
+        .checkbox-label,
+        .radio-label,
+        .kvkk-checkbox-label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 0.25rem 0;
+        }
+    }
+
+    /* Mobil responsive boyutlar */
+    @@media (max-width: 768px) {
+        .checkbox-input,
+        .radio-input,
+        .kvkk-checkbox {
+            width: 16px !important;
+            height: 16px !important;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .checkbox-input,
+        .radio-input,
+        .kvkk-checkbox {
+            width: 16px !important;
+            height: 16px !important;
+        }
+    }
+
+    @@media (max-width: 360px) {
+        .checkbox-input,
+        .radio-input,
+        .kvkk-checkbox {
+            width: 14px !important;
+            height: 14px !important;
+        }
+    }
+
+    /* Focus stilleri */
+    .checkbox-input:focus,
+    .radio-input:focus,
+    .kvkk-checkbox:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+    }
+
+    /* Label'ların düzgün hizalanması */
+    .checkbox-group,
+    .radio-group {
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .kvkk-checkbox-group {
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    /* Container'ların padding ayarları */
+    .checkbox-container,
+    .radio-container {
+        padding: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .checkbox-container,
+        .radio-container {
+            padding: 0.875rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .checkbox-container,
+        .radio-container {
+            padding: 0.75rem;
+        }
+    }
 </style>
-
+    
+    
 <div id="personelApp" class="form-container">
-    <h1 class="page-title">Bizimle Çalış</h1>
+ 
 
+    <h1 class="page-title">Bizimle Çalış</h1>
+    <!-- KVKK Modal -->
+    <div id="kvkkModal" class="kvkk-modal">
+        <div class="kvkk-modal-content">
+            <div class="kvkk-modal-header">
+                <h2 class="kvkk-modal-title">Kişisel Verilerin Korunması Hakkında Bilgilendirme</h2>
+                <button class="kvkk-close" v-on:click="closeKvkkModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="kvkk-modal-body">
+                <div class="kvkk-text">
+                    <h3>Veri Sorumlusu</h3>
+                    <p>Şirketimiz, kişisel verilerinizin işlenmesinde veri sorumlusu sıfatıyla hareket etmektedir.</p>
+
+                    <h3>Kişisel Verilerin İşlenme Amacı</h3>
+                    <p>Kişisel verileriniz aşağıdaki amaçlarla işlenmektedir:</p>
+                    <ul>
+                        <li>İş başvurunuzun değerlendirilmesi</li>
+                        <li>İnsan kaynakları süreçlerinin yürütülmesi</li>
+                        <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+                        <li>İletişim faaliyetlerinin yürütülmesi</li>
+                    </ul>
+
+                    <h3>İşlenen Kişisel Veri Kategorileri</h3>
+                    <ul>
+                        <li>Kimlik bilgileri (ad, soyad)</li>
+                        <li>İletişim bilgileri (telefon, adres)</li>
+                        <li>Fiziksel mekân güvenliği (fotoğraf)</li>
+                        <li>Mesleki deneyim bilgileri</li>
+                    </ul>
+
+                    <h3>Kişisel Verilerin Aktarılması</h3>
+                    <p>Kişisel verileriniz, yasal zorunluluklar çerçevesinde ilgili kamu kurum ve kuruluşları ile paylaşılabilir.</p>
+
+                    <h3>Kişisel Veri Sahibinin Hakları</h3>
+                    <p>KVKK Kanunu'nun 11. maddesi uyarınca sahip olduğunuz haklar:</p>
+                    <ul>
+                        <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
+                        <li>İşlenen kişisel verileriniz hakkında bilgi talep etme</li>
+                        <li>Kişisel verilerinizin düzeltilmesini isteme</li>
+                        <li>Belirli koşullarda kişisel verilerinizin silinmesini isteme</li>
+                        <li>İşleme işlemine itiraz etme</li>
+                    </ul>
+
+                    <h3>İletişim</h3>
+                    <p>KVKK kapsamındaki taleplerinizi <strong>info@guvenlikbul.com</strong> adresine iletebilirsiniz.</p>
+                </div>
+            </div>
+
+            <div class="kvkk-modal-footer">
+                <div class="kvkk-checkbox-group">
+                    <input type="checkbox"
+                           id="kvkkAccept"
+                           v-model="kvkkAccepted"
+                           class="kvkk-checkbox" />
+                    <label for="kvkkAccept" class="kvkk-checkbox-label">
+                        KVKK Aydınlatma Metni'ni okudum, anladım ve kabul ediyorum.
+                    </label>
+                </div>
+                <button class="kvkk-accept-btn"
+                        :class="{ 'enabled': kvkkAccepted }"
+                        :disabled="!kvkkAccepted"
+                        v-on:click="acceptKvkk">
+                    <i class="fas fa-check"></i> Onaylıyorum
+                </button>
+            </div>
+        </div>
+    </div>
     @Html.AntiForgeryToken()
+ 
 
     <form v-on:submit.prevent="submitForm">
         <div class="form-grid">
@@ -580,8 +1787,10 @@
                 </div>
             </div>
         </div>
-
-        <button type="submit" class="submit-btn" :disabled="isSubmitting">
+        <button type="button"
+                class="submit-btn"
+                :disabled="isSubmitting"
+                v-on:click="checkKvkkBeforeSubmit">
             <span v-if="!isSubmitting">
                 <i class="fas fa-paper-plane"></i> Başvuruyu Gönder
             </span>
@@ -641,6 +1850,9 @@
                 },
                 imagePreview: null,
                 isSubmitting: false,
+                kvkkAccepted: false,
+                isKvkkAccepted: false,
+                showKvkkModal: false,
                 cities: [
                     'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin',
                     'Aydın', 'Balıkesir', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa',
@@ -656,6 +1868,43 @@
             }
         },
         methods: {
+            checkKvkkBeforeSubmit(event) {
+                if (!this.isKvkkAccepted) {
+                    event.preventDefault();
+                    this.openKvkkModal();
+                    return false;
+                }
+                this.submitForm();
+            },
+
+            openKvkkModal() {
+                this.showKvkkModal = true;
+                document.getElementById('kvkkModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            },
+
+            closeKvkkModal() {
+                this.showKvkkModal = false;
+                document.getElementById('kvkkModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+                this.kvkkAccepted = false;
+            },
+
+            acceptKvkk() {
+                if (this.kvkkAccepted) {
+                    this.isKvkkAccepted = true;
+                    this.closeKvkkModal();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'KVKK Onaylandı!',
+                        text: 'Artık başvurunuzu gönderebilirsiniz.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            },
+
             handleFileUpload(event) {
                 const file = event.target.files[0];
                 if (file) {
@@ -816,6 +2065,7 @@
                     this.isSubmitting = false;
                 }
             },
+
             resetForm() {
                 this.formData = {
                     cardName: '',
@@ -830,6 +2080,7 @@
                     image: null
                 };
                 this.imagePreview = null;
+                this.isKvkkAccepted = false; // KVKK onayını da sıfırla
                 document.getElementById('image').value = '';
             }
         }

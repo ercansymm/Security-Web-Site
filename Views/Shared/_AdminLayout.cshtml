@@ -91,43 +91,39 @@
             background: var(--bg-primary);
         }
 
-        .logo {
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-decoration: none;
+
+
+        .custom-logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            justify-content: center;
+            text-decoration: none;
             transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: var(--radius-lg);
         }
 
-            .logo i {
-                width: 2rem;
-                height: 2rem;
-                background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-                border-radius: var(--radius-lg);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 1rem;
-                flex-shrink: 0;
+            .custom-logo:hover {
+                background-color: rgba(37, 99, 235, 0.05);
+                transform: scale(1.02);
             }
 
-        .logo-text {
-            transition: opacity 0.3s ease;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            .custom-logo img {
+                max-width: 100%;
+                height: auto;
+                object-fit: contain;
+                transition: all 0.3s ease;
+                /* Bu kısımları siz özelleştireceksiniz */
+                width: 65px;
+                height: 65px;
+            }
+
+        .sidebar.collapsed .custom-logo img {
+            width: 35px; /* Sidebar kapalıyken logo boyutu */
+            height: 35px; /* Sidebar kapalıyken logo boyutu */
         }
 
-        .sidebar.collapsed .logo-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-        }
+  
 
         /* Modern Menu */
         .menu {
@@ -565,6 +561,549 @@
             outline-offset: 2px;
         }
 
+        /* ===== ADMIN PANEL RESPONSIVE KODLAR - MEVCUT KODLARIN SONUNA EKLE ===== */
+
+        /* Tablet ve küçük laptop için (1024px ve altı) */
+        @@media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 260px;
+                --topbar-height: 65px;
+            }
+
+            .topbar {
+                padding: 0 1.5rem;
+                height: var(--topbar-height);
+            }
+
+            .content {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1.3rem;
+            }
+
+            .breadcrumb {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Tablet için (768px ve altı) */
+        @@media (max-width: 768px) {
+            :root {
+                --sidebar-width: 280px;
+                --topbar-height: 60px;
+            }
+
+            .admin-container {
+                position: relative;
+            }
+            /* Sidebar mobile modda */
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1001;
+            }
+
+                .sidebar.mobile-open {
+                    transform: translateX(0);
+                }
+
+                .sidebar.collapsed {
+                    transform: translateX(-100%);
+                    width: var(--sidebar-width);
+                }
+
+                    .sidebar.collapsed.mobile-open {
+                        transform: translateX(0);
+                    }
+            /* Main content mobile modda */
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar.collapsed + .main-content {
+                margin-left: 0;
+            }
+            /* Topbar mobile */
+            .topbar {
+                padding: 0 1rem;
+                height: var(--topbar-height);
+            }
+
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+
+            .sidebar-toggle {
+                display: none;
+            }
+
+            .sidebar-overlay {
+                display: none;
+            }
+
+                .sidebar-overlay.active {
+                    display: block;
+                }
+            /* Logo mobile */
+            .logo-area {
+                padding: 1rem 1.5rem;
+                height: var(--topbar-height);
+            }
+
+            .custom-logo img {
+                width: 50px;
+                height: 50px;
+            }
+            /* Menu mobile */
+            .menu {
+                padding: 1rem;
+            }
+
+            .menu-link {
+                padding: 1rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+                .menu-link i {
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    font-size: 1.1rem;
+                }
+            /* Content mobile */
+            .content {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.2rem;
+            }
+
+            .breadcrumb {
+                font-size: 0.75rem;
+                margin-top: 0.5rem;
+            }
+            /* User info mobile */
+            .user-details {
+                display: none;
+            }
+
+            .logout-btn span {
+                display: none;
+            }
+
+            .logout-btn {
+                padding: 0.5rem;
+                width: 2.5rem;
+                height: 2.5rem;
+                justify-content: center;
+            }
+        }
+
+        /* Büyük telefon için (640px ve altı) */
+        @@media (max-width: 640px) {
+            :root {
+                --topbar-height: 55px;
+            }
+
+            .topbar {
+                padding: 0 0.75rem;
+                height: var(--topbar-height);
+            }
+
+            .logo-area {
+                padding: 0.75rem 1rem;
+                height: var(--topbar-height);
+            }
+
+            .custom-logo img {
+                width: 45px;
+                height: 45px;
+            }
+
+            .menu {
+                padding: 0.75rem;
+            }
+
+            .menu-link {
+                padding: 0.875rem 0.75rem;
+            }
+
+            .content {
+                padding: 0.75rem;
+            }
+
+            .page-title {
+                font-size: 1.1rem;
+            }
+
+            .breadcrumb {
+                font-size: 0.7rem;
+            }
+
+            .user-avatar {
+                width: 2rem;
+                height: 2rem;
+                font-size: 0.8rem;
+            }
+
+            .logout-btn {
+                width: 2.25rem;
+                height: 2.25rem;
+            }
+        }
+
+        /* Küçük telefon için (480px ve altı) */
+        @@media (max-width: 480px) {
+            :root {
+                --topbar-height: 50px;
+            }
+
+            .topbar {
+                padding: 0 0.5rem;
+                height: var(--topbar-height);
+            }
+
+            .logo-area {
+                padding: 0.5rem 0.75rem;
+                height: var(--topbar-height);
+            }
+
+            .custom-logo img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .menu {
+                padding: 0.5rem;
+            }
+
+            .menu-section-title {
+                font-size: 0.7rem;
+                padding: 0 0.5rem 0.25rem;
+            }
+
+            .menu-link {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+                .menu-link i {
+                    width: 1.25rem;
+                    height: 1.25rem;
+                    font-size: 1rem;
+                }
+
+            .content {
+                padding: 0.5rem;
+            }
+
+            .page-title {
+                font-size: 1rem;
+            }
+
+            .breadcrumb {
+                display: none;
+            }
+
+            .user-avatar {
+                width: 1.75rem;
+                height: 1.75rem;
+                font-size: 0.75rem;
+            }
+
+            .logout-btn {
+                width: 2rem;
+                height: 2rem;
+                font-size: 0.8rem;
+            }
+
+            .mobile-menu-toggle {
+                font-size: 1.1rem;
+                padding: 0.375rem;
+            }
+        }
+
+        /* Çok küçük telefon için (360px ve altı) */
+        @@media (max-width: 360px) {
+            :root {
+                --topbar-height: 48px;
+            }
+
+            .topbar {
+                padding: 0 0.25rem;
+                height: var(--topbar-height);
+            }
+
+            .logo-area {
+                padding: 0.25rem 0.5rem;
+                height: var(--topbar-height);
+            }
+
+            .custom-logo img {
+                width: 35px;
+                height: 35px;
+            }
+
+            .menu {
+                padding: 0.25rem;
+            }
+
+            .menu-link {
+                padding: 0.625rem 0.375rem;
+                font-size: 0.8rem;
+            }
+
+            .content {
+                padding: 0.25rem;
+            }
+
+            .content-wrapper {
+                padding: 0 0.25rem;
+            }
+
+            .page-title {
+                font-size: 0.9rem;
+            }
+
+            .logout-btn {
+                width: 1.75rem;
+                height: 1.75rem;
+                font-size: 0.75rem;
+            }
+
+            .user-avatar {
+                width: 1.5rem;
+                height: 1.5rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Landscape tablet için özel ayarlar */
+        @@media (max-width: 1024px) and (orientation: landscape) and (max-height: 768px) {
+            :root {
+                --topbar-height: 50px;
+            }
+
+            .topbar {
+                height: var(--topbar-height);
+            }
+
+            .logo-area {
+                height: var(--topbar-height);
+                padding: 0.5rem 1rem;
+            }
+
+            .menu {
+                padding: 0.5rem;
+            }
+
+            .content {
+                padding: 0.75rem;
+            }
+        }
+
+        /* Mobile için sidebar animasyon iyileştirmesi */
+        @@media (max-width: 768px) {
+            .sidebar {
+                box-shadow: var(--shadow-xl);
+            }
+
+                .sidebar.mobile-open {
+                    box-shadow: 2rem 0 3rem rgba(15, 23, 42, 0.2);
+                }
+        }
+
+        /* Touch optimizasyonu */
+        @@media (hover: none) and (pointer: coarse) {
+            .menu-link:hover,
+            .sidebar-toggle:hover,
+            .logout-btn:hover,
+            .custom-logo:hover,
+            .mobile-menu-toggle:hover,
+            .user-profile:hover,
+            .notification-btn:hover {
+                transform: none;
+                box-shadow: initial;
+            }
+
+            .menu-link:active {
+                background-color: rgba(37, 99, 235, 0.1);
+                transform: scale(0.98);
+            }
+
+            .logout-btn:active {
+                transform: scale(0.95);
+            }
+            /* Touch için daha büyük dokunma alanları */
+            .menu-link {
+                min-height: 48px;
+                padding: 0.875rem 0.75rem;
+            }
+
+            .mobile-menu-toggle {
+                min-width: 48px;
+                min-height: 48px;
+            }
+
+            .logout-btn {
+                min-width: 48px;
+                min-height: 48px;
+            }
+        }
+
+        /* Sidebar tooltip'leri mobile'da gizle */
+        @@media (max-width: 768px) {
+            .sidebar .menu-link:hover::after,
+            .sidebar .menu-link:hover::before {
+                display: none;
+            }
+        }
+
+        /* Print media query */
+        @@media print {
+            .sidebar,
+            .sidebar-toggle,
+            .mobile-menu-toggle,
+            .sidebar-overlay,
+            .topbar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .content {
+                padding: 1rem;
+                overflow: visible;
+            }
+
+            .admin-container {
+                height: auto;
+                overflow: visible;
+            }
+
+            body {
+                overflow: visible;
+                height: auto;
+            }
+        }
+
+        /* Animasyonlar - Keyframes */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Notification animasyonları */
+        @@keyframes slideInDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+        }
+
+            .notification.show {
+                transform: translateY(0);
+                opacity: 1;
+                animation: slideInDown 0.3s ease-out;
+            }
+
+        .notification-info {
+            background: var(--info-color);
+        }
+
+        .notification-success {
+            background: var(--success-color);
+        }
+
+        .notification-warning {
+            background: var(--warning-color);
+        }
+
+        .notification-error {
+            background: var(--danger-color);
+        }
+
+        /* Reduced motion için */
+        @@media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .sidebar {
+                transition: none;
+            }
+
+            .sidebar-overlay {
+                transition: none;
+            }
+        }
+
+        /* Focus styles mobile için iyileştirme */
+        @@media (max-width: 768px) {
+            .menu-link:focus {
+                outline: 2px solid var(--primary-color);
+                outline-offset: -2px;
+                background-color: rgba(37, 99, 235, 0.1);
+            }
+        }
+
+
+
+
+
     </style>
 
 </head>
@@ -575,11 +1114,14 @@
             <div class="sidebar-toggle" onclick="toggleSidebar()" title="Menüyü Daralt">
                 <i class="fas fa-chevron-left"></i>
             </div>
-
             <div class="logo-area">
-                <a href="/Admin/Dashboard" class="logo">
-                    <i class="fas fa-shield-alt"></i>
-                    <span class="logo-text">Admin Panel</span>
+                <a href="/yonetim/panel" class="custom-logo">
+                    <!-- LOGO wwwroot/LOGO/ klasöründe olmalı -->
+                    <img src="~/LOGO/logo_2-removebg-preview.png"
+                         alt="A Güvenlik Logo"
+                         class="logo-image" />
+
+                    <span class="logo-text">Yönetim</span>
                 </a>
             </div>
 
@@ -589,21 +1131,21 @@
 
 
                     <div class="menu-item">
-                        <a href="/Admin/AddPersonel" class="menu-link" data-tooltip="Personeller">
+                        <a href="/yonetim/personel-listesi" class="menu-link" data-tooltip="Personeller">
                             <i class="fas fa-users"></i>
                             <span class="menu-text">Personeller</span>
                         </a>
                     </div>
 
                     <div class="menu-item">
-                        <a href="/WebDes/Index" class="menu-link" data-tooltip="Web Açıklaması">
+                        <a href="/yonetim/site-aciklamasi" class="menu-link" data-tooltip="Web Açıklaması">
                             <i class="fas fa-globe"></i>
                             <span class="menu-text">Web Açıklaması</span>
                         </a>
                     </div>
 
                     <div class="menu-item">
-                        <a href="/Users/Index" class="menu-link" data-tooltip="Admin Yönetimi">
+                        <a href="/yonetim/adminler" class="menu-link" data-tooltip="Admin Yönetimi">
                             <i class="fas fa-user-shield"></i>
                             <span class="menu-text">Admin Yönetimi</span>
                         </a>
@@ -636,7 +1178,7 @@
                 </div>
 
                 <div class="user-info">
-                     <a href="/Admin/Logout" class="logout-btn" title="Çıkış Yap">
+                    <a href="/yonetim/cikis" class="logout-btn" title="Çıkış Yap">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Çıkış</span>
                     </a>
@@ -687,8 +1229,8 @@
 
                 // Check if current path matches or starts with link href
                 const linkPath = link.getAttribute('href');
-                if (linkPath === currentPath || (linkPath !== '/Admin/Index' && currentPath.startsWith(linkPath))) {
-                    link.classList.add('active');
+        if (linkPath === currentPath || (linkPath !== '/yonetim' && currentPath.startsWith(linkPath))) {
+                            link.classList.add('active');
                 }
             });
 

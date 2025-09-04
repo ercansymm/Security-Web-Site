@@ -35,31 +35,25 @@ namespace SecurityWebSite.Controllers
                 return View();
             }
 
-            // Kullanıcıyı veritabanında kontrol et
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserName == UserName && u.UserPassword == Password);
 
-            if (user.IsPassive == false)
+            if (user == null)
             {
-                if (user != null)
-                {
-                    // Session'a kullanıcı bilgisini kaydet
-                    HttpContext.Session.SetString("AdminUser", user.UserName);
-                    HttpContext.Session.SetString("AdminUserId", user.Ref.ToString());
-                    return RedirectToAction("Dashboard");
-                }
-                else
-                {
-                    ViewBag.Error = "Kullanıcı adı veya şifre hatalı!";
-                    return View();
-                }
+                ViewBag.Error = "Kullanıcı adı veya şifre hatalı!";
+                return View();
             }
-            else
+
+            if (user.IsPassive == true)
             {
                 ViewBag.Error = "Kullanıcı Pasif Durumunda!";
                 return View();
             }
-           
+
+            // Kullanıcı aktif, session'a kaydet
+            HttpContext.Session.SetString("AdminUser", user.UserName);
+            HttpContext.Session.SetString("AdminUserId", user.Ref.ToString());
+            return RedirectToAction("Dashboard");
         }
 
         // GET: Admin/Dashboard
@@ -178,7 +172,8 @@ namespace SecurityWebSite.Controllers
                         p.Gun,
                         p.Shift,
                         p.YearsOld,
-                        p.IsPassive
+                        p.IsPassive,
+                        p.IsAdvice  
                     })
                     .OrderBy(p => p.CardName)
                     .ThenBy(p => p.LastName)
